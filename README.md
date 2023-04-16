@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+Built on top of NextJS 13 in the React ecosystem using TailwindCSS (styling), Framer Motion (animations), Lexical Editor (rich text-editor), Next-Auth (Authentication, soon to become AuthJS) Headless UI (headless UI components), and Heroicons (well, icons) for the frontend and TRPC (typesafe communication between backend and frontend), Prisma (ORM), and PlanetScale (database) for the backend.
+
 ## Getting Started
 
 First, run the development server:
