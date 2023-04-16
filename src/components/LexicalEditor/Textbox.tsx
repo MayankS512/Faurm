@@ -31,6 +31,7 @@ import { EQUATION } from "./plugins/EquationPlugin/EquationTransformer";
 import { EquationNode } from "./plugins/EquationPlugin/EquationNode";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import { AnimatePresence, motion } from "framer-motion";
+import { useFaurmStore } from "@/store/store";
 // import { useStore } from "../store/store";
 
 const theme = {
@@ -108,10 +109,10 @@ function onChange(editorState: EditorState) {
 }
 
 function MyCustomAutoFocusPlugin({
-  toolbar,
+  // toolbar,
   editorState,
 }: {
-  toolbar: boolean;
+  // toolbar: boolean;
   editorState: MutableRefObject<EditorState | undefined>;
 }) {
   const [editor] = useLexicalComposerContext();
@@ -128,7 +129,7 @@ function MyCustomAutoFocusPlugin({
       $setSelection(null);
     });
     editorState.current = editor.getEditorState();
-  }, [toolbar, editor, editorState]);
+  }, [editor, editorState]);
 
   return null;
 }
@@ -148,16 +149,19 @@ const Textbox: React.FC<{
   editorState: MutableRefObject<EditorState | undefined>;
   id: string;
 }> = ({ disabled = { current: false }, editorState, id }) => {
-  const [toolbar, setToolbar] = useState(false);
-  const setClose = useStore((state) => state.setClose);
+  // const setClose = useStore((state) => state.setClose);
   // const form = useStore((state) => state.form);
-  const form = useStore((state) => state.forms.get(id));
+  // const form = useStore((state) => state.forms.get(id));
   const timeout = useRef<NodeJS.Timeout>();
   let t: NodeJS.Timeout;
+  const [toolbar, setToolbar] = useState(false);
+
+  // const setToolbar = useFaurmStore((state) => state.setToolbar);
+  // const toolbar = useFaurmStore((state) => state.toolbar);
 
   const initialConfig: InitialConfigType = {
     theme,
-    namespace: "Editor",
+    namespace: `Editor ${id}`,
     onError,
     nodes: [
       HeadingNode,
@@ -177,48 +181,70 @@ const Textbox: React.FC<{
     //   if (!form.question) return null;
     //   return editor.setEditorState(editor.parseEditorState(form.question));
     // },
-    editorState: (editor) => {
-      if (!form || !form.question) return;
-      editor.setEditorState(form.question);
-    },
+
+    // editorState: (editor) => {
+    // if (!form || !form.question) return;
+    // editor.setEditorState(form.question);
+    // },
   };
+
+  // ? If rerenders cause perf issues:
+  // * 1. Switch back to focus-within:ring-2 instead of using toolbar for styling.
+  // * 2. Put toolbar code snippet (with Animate Presence) in a separate component and use ContextAPI to pass state to the new component and set it from this component.
+
+  // ? The occasional focusing on toolbar is only being caused due to testing (i.e. focusing and bluring in rapid succession, fast enough that the toolbar does not finish the animation and unmount), but if it is getting out of hand:
+  // * 1. Again put the toolbar code snippet in a separate component.
+  // * 2. Create another boolean state that is true onAnimationStart and false onAnimationEnd.
+  // * 3. Pass this state on to ToolbarPlugin as disabled state and pass it to every focusable element as their disabled property.
+  // ? Considering they already have !isEditable as disabled, the property would look like: (!isEditable || disabled)
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div
-        data-no-dnd="true"
+        // data-no-dnd="true"
         onBlur={() => {
-          timeout.current = setTimeout(() => setClose(true), 10);
-          setToolbar(false);
+          // if (toolbarRef.current) toolbarRef.current(false);
+
+          timeout.current = setTimeout(() => {
+            setToolbar(false);
+            // setClose(true);
+          }, 10);
         }}
         onFocus={(e) => {
-          if (disabled.current) {
-            e.target.blur();
-            return;
-          }
-          clearTimeout(timeout.current);
-          setClose(false);
-          setToolbar(true);
-        }}
-        className="relative flex flex-col rounded-sm w-80 bg-neutral-800 focus-within:ring-2 ring-offset-1 ring-offset-neutral-900 ring-neutral-200"
-      >
-        <motion.div
-          className="w-full"
-          initial={{ height: 0 }}
-          animate={{ height: toolbar ? 48 : 0 }}
-          transition={{ duration: 0.25 }}
-        ></motion.div>
-        <AnimatePresence>{toolbar && <ToolbarPlugin />}</AnimatePresence>
+          // if (disabled.current) {
+          //   e.target.blur();
+          //   return;
+          // }
 
-        <div
-          className="relative w-full rounded-sm bg-neutral-700 "
-          onKeyDown={(e) => e.stopPropagation()}
-        >
+          clearTimeout(timeout.current);
+
+          // if (toolbarRef.current) toolbarRef.current(true);
+
+          setToolbar(true);
+          // setClose(false);
+        }}
+        className={`flex flex-col rounded-sm w-80 bg-neutral-800 ring-offset-1  ring-offset-neutral-900 ring-neutral-200 ${
+          toolbar ? "ring-2" : ""
+        }`}
+      >
+        <AnimatePresence>
+          <motion.div
+            key={toolbar.toString()}
+            className="w-full"
+            initial={{ height: 0 }}
+            animate={{ height: "auto" }}
+            exit={{ height: 0 }}
+          >
+            {toolbar && <ToolbarPlugin />}
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="relative w-full rounded-sm bg-neutral-700">
           <RichTextPlugin
             contentEditable={
               <ContentEditable
-                // aria-required
-                className="p-2 overflow-y-auto rounded-sm editor-scroll max-h-40 focus:outline-none"
+                aria-required
+                className="p-2 overflow-y-auto rounded-sm outline-none editor-scroll max-h-40 "
               />
             }
             placeholder={Placeholder}
@@ -240,7 +266,7 @@ const Textbox: React.FC<{
           <HistoryPlugin />
           <EquationsPlugin />
           <MyCustomAutoFocusPlugin
-            toolbar={toolbar}
+            // toolbar={toolbar}
             editorState={editorState}
           />
         </div>

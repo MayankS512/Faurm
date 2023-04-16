@@ -487,18 +487,8 @@ export default function ToolbarPlugin(): JSX.Element {
   );
 
   return (
-    // bg-neutral-800
-    // motion.
-    <motion.div
-      // initial={{
-      //   y: 40,
-      // }}
-      // animate={{ y: 0 }}
-      transition={{
-        duration: 0.25,
-      }}
-      exit={{ y: 0 }}
-      className="absolute flex items-center gap-2 p-2 text-neutral-200 "
+    <div
+      className="flex items-center gap-2 p-2 text-neutral-200 "
     >
       {/* <IconButton
         disabled={!canUndo || !isEditable}
@@ -654,7 +644,7 @@ export default function ToolbarPlugin(): JSX.Element {
       >
         <Bars3Icon className="icon" />
       </IconButton> */}
-    </motion.div>
+    </div>
   );
 }
 

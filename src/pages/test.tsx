@@ -1,21 +1,20 @@
-import React from 'react'
+import Textbox from "@/components/LexicalEditor/Textbox";
+import { EditorState } from "lexical";
+import Head from "next/head";
+import React, { useRef } from "react";
 
-const test = () => {
+const Test = () => {
+  const editorState = useRef<EditorState>();
   return (
-    <div><textarea
-    className="w-full h-full p-2 my-2 overflow-hidden text-2xl text-center rounded-sm resize-none sm:w-1/2 bg-neutral-800"
-    autoFocus={true}
-    onChange={(e) => {
-      console.log(e.target.scrollHeight, e.target.scrollTop);
+    <main className="flex w-screen h-screen bg-neutral-900">
+      <Head>
+        <title>Test</title>
+      </Head>
+      <div className="p-4 mx-auto my-auto bg-neutral-800 ">
+      <Textbox id="1" editorState={editorState}/>
+      </div>
+    </main>
+  );
+};
 
-      e.target.style.height = "";
-      e.target.style.height = e.target.scrollHeight + "px";
-    }}
-    onKeyDownCapture={(e) => {
-      if (e.key === "Enter") e.preventDefault();
-    }}
-  ></textarea></div>
-  )
-}
-
-export default test
+export default Test;

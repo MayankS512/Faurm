@@ -1,7 +1,7 @@
 import React, { MouseEvent, use, useEffect, useRef, useState } from "react";
 import { Listbox, Portal } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { useStore } from "../store/store";
+// import { useStore } from "../store/store";
 
 interface DropdownProps {
   value: any;
@@ -44,7 +44,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   const btnRef = useRef<HTMLDivElement>(null);
   // const optionsRef = useRef<HTMLElement>(null);
 
-  const close = useStore((state) => state.close);
+  // const close = useStore((state) => state.close);
   // const [close, setClose] = useState(false);
   // const display = useRef<boolean>(false);
 
