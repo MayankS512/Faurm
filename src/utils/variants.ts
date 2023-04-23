@@ -1,4 +1,4 @@
-const PrimaryDuration = 2.5;
+const PrimaryDuration = 0.5;
 const StaggerDuration = 0.04;
 
 export const ContainerVariant = {

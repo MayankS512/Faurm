@@ -99,6 +99,9 @@ const theme = {
   },
 };
 
+const defaultState =
+  '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}';
+
 function onChange(editorState: EditorState) {
   editorState.read(() => {
     const root = $getRoot();
@@ -193,8 +196,10 @@ const Textbox: React.FC<{
       EquationNode,
     ],
     editorState(editor) {
-      if (!question || !question.title) return null;
-      return editor.setEditorState(editor.parseEditorState(question.title));
+      if (!question || !question.title)
+        return editor.setEditorState(editor.parseEditorState(defaultState));
+
+      return editor.setEditorState(editor.parseEditorState(question?.title));
     },
   };
 

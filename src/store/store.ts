@@ -1,6 +1,8 @@
 import { EditorState, SerializedEditorState } from "lexical";
 import { create } from "zustand";
 
+// TODO: Simplify the logic and try to use arrays instead of Map.
+
 type FaurmQuestion =
   | {
       title?: SerializedEditorState;

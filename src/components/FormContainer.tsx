@@ -32,8 +32,6 @@ const FormContainer: React.FC<FormContainerProps> = ({
 
   useEffect(() => {
     if (open) return;
-
-    setQuestion(id, { type, fields: type !== "Text" ? [] : undefined });
   }, [open]);
 
   return (
