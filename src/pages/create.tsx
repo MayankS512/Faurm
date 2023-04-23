@@ -5,7 +5,7 @@ import { RoundedButton } from "@/components/RoundedButton";
 import SortableItem from "@/components/SortableItem";
 import TemplateForm from "@/components/TemplateForm";
 import { useFaurmStore } from "@/store/store";
-import { UniqueIdentifier } from "@dnd-kit/core";
+import { DragOverlay, UniqueIdentifier } from "@dnd-kit/core";
 import {
   AnimatePresence,
   MotionValue,
@@ -39,12 +39,15 @@ export default function Create() {
   const [items, setItems] = useState<number[]>([1, 2, 3, 4, 5]);
   const [clouds, setClouds] = useState<[number, number]>([0, 0]);
   const [open, setOpen] = useState<number>();
+  // const open = useFaurmStore((state) => state.open);
+  // const setOpen = useFaurmStore((state) => state.setOpen);
 
   const addItem = () => {
     setItems((prev) => [...prev, (prev[prev.length - 1] ?? 0) + 1]);
   };
 
   const container = useRef<HTMLDivElement>(null);
+  const lastOpen = useRef<number>();
   // const constraint = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -165,7 +168,7 @@ export default function Create() {
                       // x.set(0);
                     }}
                   >
-                    {item}
+                    {idx + 1}
                   </RoundedButton>
                 </SortableItem>
               ))}
@@ -223,7 +226,7 @@ export default function Create() {
         </h1> */}
 
           <FormTitle />
-          <div className="relative flex-1 flex flex-col w-full overflow-y-auto scroll-smooth lg:hidden sm:flex-auto sm:max-h-full sm:p-4 touch-pan-y">
+          <div className="relative flex flex-col flex-1 w-full overflow-y-auto scroll-smooth lg:hidden sm:flex-auto sm:max-h-full sm:p-4 touch-pan-y">
             {/*
           // ? Could potentially replace Animate Presence with Transition (Headless UI) since plain divs do not cause issues in perf, adding / removing from DOM tree might be more expensive. 
           */}
@@ -240,10 +243,11 @@ export default function Create() {
               ) : null}
               <div
                 ref={container}
-                className="flex flex-col touch-pan-y h-full gap-4 overflow-auto"
+                className="flex flex-col h-full gap-4 overflow-auto touch-pan-y"
               >
                 {items.map((item, idx) => (
-                  <TemplateForm key={idx} title={item} />
+                  // TODO: title should be idx
+                  <TemplateForm id={item} key={item} title={idx + 1} />
                 ))}
               </div>
               {items.length > 1 && clouds[1] ? (
@@ -260,13 +264,25 @@ export default function Create() {
           </div>
         </motion.main>
       ) : (
-        <main className="flex flex-col items-center w-full h-full gap-4 p-4  justify-evenly bg-neutral-900 text-neutral-200">
+        <main className="flex flex-col items-center w-full h-full gap-4 p-4 justify-evenly bg-neutral-900 text-neutral-200">
           <FormTitle />
-          <div className="flex justify-center items-center w-full min-w-fit gap-4 p-4 overflow-auto">
+          <div className="flex items-center justify-center w-full gap-4 p-4 overflow-auto min-w-fit">
             <DndContainer<number>
               items={items}
               setItems={setItems}
               orientation="horizontal"
+              keyboardEvents={{
+                start() {
+                  // console.log("started");
+                  lastOpen.current = open;
+                  setOpen(undefined);
+                },
+                end() {
+                  // console.log("ended");
+                  setOpen(lastOpen.current);
+                  lastOpen.current = undefined;
+                },
+              }}
               // ? Might go back to putting drag overlay outside
               Overlay={({ children }) => (
                 <RoundedButton className="text-neutral-200 bg-neutral-800">
@@ -280,14 +296,32 @@ export default function Create() {
                   id={item}
                   key={item}
                 >
-                  <FormContainer
-                    id={item.toString()}
-                    title={item.toString()}
+                  {/* // TODO: Maybe find a better way to handle the layout shift during keyboard sort */}
+                  {lastOpen.current === undefined ? (
+                    <FormContainer
+                      id={item}
+                      // TODO: title should be idx
+                      title={item}
+                      open={open === item}
+                      onClick={() => {
+                        setOpen((prev) => (prev === item ? undefined : item));
+                      }}
+                    />
+                  ) : (
+                    <RoundedButton className="text-neutral-200 bg-neutral-800">
+                      {item}
+                    </RoundedButton>
+                  )}
+                  {/* <FormContainer
+                    id={item}
+                    // TODO: title should be idx
+                    title={item}
                     open={open === item}
                     onClick={() => {
                       setOpen((prev) => (prev === item ? undefined : item));
+                      // setOpen(open === item ? undefined : item);
                     }}
-                  />
+                  /> */}
                 </SortableItem>
               ))}
             </DndContainer>

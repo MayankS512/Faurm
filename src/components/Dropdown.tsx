@@ -9,6 +9,8 @@ interface DropdownProps {
   disabled?: boolean;
   name: React.ReactNode;
   children?: React.ReactNode;
+  label?: string;
+  length?: number;
 }
 
 interface DropdownOptionProps {
@@ -39,13 +41,14 @@ const Dropdown: React.FC<DropdownProps> = ({
   onChange,
   disabled = false,
   name,
+  label,
   children,
+  length = 6,
 }) => {
   const btnRef = useRef<HTMLDivElement>(null);
   // const optionsRef = useRef<HTMLElement>(null);
 
   // const close = useStore((state) => state.close);
-  // const [close, setClose] = useState(false);
   // const display = useRef<boolean>(false);
 
   // const [options, setOptions] = useState(false);
@@ -95,38 +98,40 @@ const Dropdown: React.FC<DropdownProps> = ({
   return (
     <Listbox value={value} onChange={onChange} disabled={disabled}>
       {({ open }) => (
-        <div ref={btnRef} className="relative select-none ">
-          <Listbox.Button
-            onKeyDown={(e) => e.stopPropagation()}
-            // onClick={() => {
-            //   setClose(false);
-            //   // display.current = false;
-            // }}
-            aria-label="Formatting options for text style"
-            className="flex items-center w-full gap-2 px-2 py-1 rounded-sm outline-none focus-visible:ring-2 ring-offset-1 focus-visible:bg-neutral-700 ring-neutral-200 ring-offset-neutral-800 hover:bg-neutral-700 text-neutral-200"
-          >
-            <span className="overflow-x-hidden text-ellipsis whitespace-nowrap">
-              {name}
-            </span>
-            <ChevronDownIcon
-              strokeWidth={2}
-              className={`w-5 h-5 min-h-[1.25rem] min-w-[1.25rem] ${
-                open ? "-rotate-180" : ""
-              } transition duration-100 `}
-            />
-          </Listbox.Button>
-          {/* 
+        <div
+          className={`flex items-center min-w-0 gap-2 sm:w-full lg:w-auto ${
+            name === "Code Block" ? "" : "first:lg:flex-shrink-0"
+          }`}
+        >
+          {label && (
+            <Listbox.Label className="w-full min-w-fit">{label}</Listbox.Label>
+          )}
+          <div ref={btnRef} className="relative w-full select-none">
+            <Listbox.Button
+              onKeyDown={(e) => {
+                // e.stopPropagation();
+              }}
+              aria-label="Formatting options for text style"
+              className="flex items-center justify-between w-full gap-2 px-2 py-1 rounded-sm outline-none focus-visible:ring-2 ring-offset-1 focus-visible:bg-neutral-700 ring-neutral-200 ring-offset-neutral-800 hover:bg-neutral-700 text-neutral-200"
+            >
+              <span className="overflow-x-hidden text-ellipsis whitespace-nowrap">
+                {name}
+              </span>
+              <ChevronDownIcon
+                strokeWidth={2}
+                className={`w-5 h-5 min-h-[1.25rem] min-w-[1.25rem] ${
+                  open ? "-rotate-180" : ""
+                } transition duration-100 `}
+              />
+            </Listbox.Button>
+            {/* 
           // * Try using portal again if getting stuck. 
           */}
-          {/* {open && !close && (
+            {/* {open && !close && (
             <Portal>
               <Listbox.Options
                 // static
                 // ref={optionsRef}
-                // onBlur={() => {
-                //   setClose(true);
-                //   // display.current = true;
-                // }}
                 style={{
                   top: btnRef.current?.getBoundingClientRect().y,
                   left: btnRef.current?.getBoundingClientRect().x,
@@ -137,18 +142,13 @@ const Dropdown: React.FC<DropdownProps> = ({
               </Listbox.Options>
             </Portal>
           )} */}
-          {open && !close && (
             <Listbox.Options
-              static
-              // onBlur={() => {
-              //   setClose(true);
-              //   // display.current = true;
-              // }}
-              className="absolute z-10 h-[600%] overflow-x-hidden overflow-y-auto rounded-sm shadow-lg outline-none min-w-fit w-full dropdown-scroll whitespace-nowrap text-ellipsis bg-neutral-800 shadow-neutral-900"
+              style={{ height: length + "00%" }}
+              className="absolute z-10 w-full overflow-x-hidden overflow-y-auto rounded-sm shadow-lg outline-none min-w-fit dropdown-scroll whitespace-nowrap text-ellipsis bg-neutral-800 shadow-neutral-900"
             >
               {children}
             </Listbox.Options>
-          )}
+          </div>
         </div>
       )}
     </Listbox>

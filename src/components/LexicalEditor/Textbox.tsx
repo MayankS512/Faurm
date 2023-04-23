@@ -108,15 +108,13 @@ function onChange(editorState: EditorState) {
   });
 }
 
-function MyCustomAutoFocusPlugin({
-  // toolbar,
-  editorState,
-}: {
+// TODO: Test if this save on blur works without toolbar state, if it doesn't, add it back to the dependancy.
+function MyCustomAutoFocusPlugin({}: // toolbar,
+{
   // toolbar: boolean;
-  editorState: MutableRefObject<EditorState | undefined>;
 }) {
   const [editor] = useLexicalComposerContext();
-  // const setForm = useStore((state) => state.setForm);
+  const questions = useFaurmStore((state) => state.questions);
 
   useEffect(() => {
     // editor.focus();
@@ -128,8 +126,7 @@ function MyCustomAutoFocusPlugin({
     editor.update(() => {
       $setSelection(null);
     });
-    editorState.current = editor.getEditorState();
-  }, [editor, editorState]);
+  }, [editor]);
 
   return null;
 }
@@ -139,25 +136,43 @@ function onError(error: any) {
 }
 
 const Placeholder: React.FC = () => (
-  <div className="absolute top-0 left-0 z-0 inline-block p-2 overflow-hidden pointer-events-none select-none whitespace-nowrap text-neutral-400 text-ellipsis">
+  <div className="absolute top-0 left-0 z-0 inline-block w-full p-2 overflow-hidden pointer-events-none select-none whitespace-nowrap text-neutral-400 text-ellipsis">
     Enter Question Here...
   </div>
 );
 
 const Textbox: React.FC<{
-  disabled?: MutableRefObject<boolean>;
-  editorState: MutableRefObject<EditorState | undefined>;
-  id: string;
-}> = ({ disabled = { current: false }, editorState, id }) => {
+  id: number;
+}> = ({ id }) => {
   // const setClose = useStore((state) => state.setClose);
   // const form = useStore((state) => state.form);
   // const form = useStore((state) => state.forms.get(id));
+  const eState = useRef<EditorState>();
+  const questions = useFaurmStore((state) => state.questions);
+  const question = questions.get(id);
+  const setQuestion = useFaurmStore((state) => state.setQuestion);
   const timeout = useRef<NodeJS.Timeout>();
   let t: NodeJS.Timeout;
   const [toolbar, setToolbar] = useState(false);
+  const [disabled, setDisabled] = useState(true);
 
   // const setToolbar = useFaurmStore((state) => state.setToolbar);
   // const toolbar = useFaurmStore((state) => state.toolbar);
+
+  useEffect(() => {
+    return () => {
+      if (!eState.current) return;
+      // questions.set(id, {
+      //   title: eState.current.toJSON(),
+      //   type: "Text",
+      // });
+      setQuestion(id, { title: eState.current.toJSON() });
+    };
+  }, [id, questions, setQuestion]);
+
+  useEffect(() => {
+    setDisabled(false);
+  }, []);
 
   const initialConfig: InitialConfigType = {
     theme,
@@ -177,15 +192,10 @@ const Textbox: React.FC<{
       LinkNode,
       EquationNode,
     ],
-    // editorState: (editor) => {
-    //   if (!form.question) return null;
-    //   return editor.setEditorState(editor.parseEditorState(form.question));
-    // },
-
-    // editorState: (editor) => {
-    // if (!form || !form.question) return;
-    // editor.setEditorState(form.question);
-    // },
+    editorState(editor) {
+      if (!question || !question.title) return null;
+      return editor.setEditorState(editor.parseEditorState(question.title));
+    },
   };
 
   // ? If rerenders cause perf issues:
@@ -201,29 +211,34 @@ const Textbox: React.FC<{
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <div
-        // data-no-dnd="true"
+        // onPointerDownCapture={(e) => e.stopPropagation()}
+        data-no-dnd="true"
         onBlur={() => {
           // if (toolbarRef.current) toolbarRef.current(false);
-
           timeout.current = setTimeout(() => {
             setToolbar(false);
-            // setClose(true);
-          }, 10);
+          }, 100);
+
+          if (!eState.current) return;
+          // questions.set(id, {
+          //   title: eState.current.toJSON(),
+          //   type: "Text",
+          // });
+          setQuestion(id, { title: eState.current.toJSON() });
         }}
         onFocus={(e) => {
-          // if (disabled.current) {
-          //   e.target.blur();
-          //   return;
-          // }
+          if (disabled) {
+            e.target.blur();
+            return;
+          }
 
           clearTimeout(timeout.current);
 
           // if (toolbarRef.current) toolbarRef.current(true);
 
           setToolbar(true);
-          // setClose(false);
         }}
-        className={`flex flex-col rounded-sm w-80 bg-neutral-800 ring-offset-1  ring-offset-neutral-900 ring-neutral-200 ${
+        className={`flex flex-col h-full rounded-sm  w-full bg-neutral-800 ring-offset-1  ring-offset-neutral-900 ring-neutral-200 ${
           toolbar ? "ring-2" : ""
         }`}
       >
@@ -235,7 +250,7 @@ const Textbox: React.FC<{
             animate={{ height: "auto" }}
             exit={{ height: 0 }}
           >
-            {toolbar && <ToolbarPlugin />}
+            {toolbar && !disabled && <ToolbarPlugin />}
           </motion.div>
         </AnimatePresence>
 
@@ -250,25 +265,21 @@ const Textbox: React.FC<{
             placeholder={Placeholder}
             ErrorBoundary={LexicalErrorBoundary}
           />
-          {/* <OnChangePlugin
+          <OnChangePlugin
             onChange={(editorState) => {
-              setForm({
-                id: "",
-                question: editorState,
-                options: [],
-              });
+              // questions.set(id, {
+              //   title: editorState.toJSON(),
+              //   type: "Text",
+              // });
+              eState.current = editorState;
             }}
-          /> */}
+          />
           <ListPlugin />
           <LinkPlugin />
           <MarkdownShortcutPlugin transformers={[...TRANSFORMERS, EQUATION]} />
           <CodeHighlightPlugin />
           <HistoryPlugin />
           <EquationsPlugin />
-          <MyCustomAutoFocusPlugin
-            // toolbar={toolbar}
-            editorState={editorState}
-          />
         </div>
       </div>
     </LexicalComposer>

@@ -109,3 +109,292 @@ a {
     color-scheme: dark;
   }
 }
+
+.icon {
+  @apply w-5 h-5 p-[2px];
+}
+
+.dropdown-scroll::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.dropdown-scroll::-webkit-scrollbar-track {
+  @apply rounded-r-sm bg-neutral-800;
+}
+
+.dropdown-scroll::-webkit-scrollbar-thumb {
+  @apply rounded-r-sm bg-neutral-700;
+}
+
+.hidden-scroll::-webkit-scrollbar {
+  @apply hidden;
+}
+
+.editor-scroll::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.editor-scroll::-webkit-scrollbar-track {
+  @apply rounded-br-sm bg-neutral-700;
+}
+
+.editor-scroll::-webkit-scrollbar-thumb {
+  @apply bg-neutral-600;
+}
+
+editor-list-ol.editor-placeholder {
+  /* color: #999;
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  top: 15px;
+  left: 10px;
+  font-size: 15px;
+  user-select: none;
+  display: inline-block;
+  pointer-events: none; */
+
+  @apply absolute inline-block overflow-hidden text-base pointer-events-none select-none left-2 top-4 text-ellipsis text-neutral-400;
+}
+
+.editor-text-bold {
+  /* font-weight: bold; */
+
+  @apply font-bold;
+}
+
+.editor-text-italic {
+  /* font-style: italic; */
+
+  @apply italic;
+}
+
+.editor-text-underline {
+  /* text-decoration: underline; */
+
+  @apply underline;
+}
+
+.editor-text-strikethrough {
+  /* text-decoration: line-through; */
+
+  @apply line-through;
+}
+
+.editor-text-underlineStrikethrough {
+  /* text-decoration: underline line-through; */
+
+  @apply underline-through;
+}
+
+/* TODO: Could be done better. */
+.editor-text-code {
+  /* background-color: rgb(240, 242, 245); */
+  /* padding: 1px 0.25rem; */
+  /* font-family: Menlo, Consolas, Monaco, monospace; */
+  /* font-size: 94%; */
+
+  @apply bg-neutral-900 rounded-sm text-neutral-200 p-1 font-mono text-[94%];
+}
+
+.editor-link {
+  /* color: rgb(33, 111, 219); */
+  /* text-decoration: none; */
+
+  @apply text-blue-600 no-underline;
+}
+
+.editor-code {
+  /* background-color: rgb(240, 242, 245); */
+  /* font-family: Menlo, Consolas, Monaco, monospace; */
+  /* display: block; */
+  /* padding: 8px 8px 8px 52px; */
+  /* line-height: 1.53; */
+  /* font-size: 13px; */
+  /* margin: 0; */
+  /* margin-top: 8px; */
+  /* margin-bottom: 8px; */
+  tab-size: 4; /* TODO: Could add as plugin */
+  /* white-space: pre; */
+  /* overflow-x: auto; */
+  /* position: relative; */
+
+  /* overflow-x-auto whitespace-nowrap */
+  @apply relative block p-2 pt-4 pl-12 m-0 my-2 font-mono text-sm transition-all duration-200 rounded-sm text-neutral-200 bg-neutral-900;
+}
+
+.editor-code:before {
+  content: attr(data-gutter);
+  /* position: absolute; */
+  /* background-color: #eee; */
+  /* left: 0; */
+  /* top: 0; */
+  /* border-right: 1px solid #ccc; */
+  /* padding: 8px; */
+  /* color: #777; */
+  /* white-space: pre-wrap; */
+  /* text-align: right; */
+  /* min-width: 25px; */
+
+  @apply absolute p-2 pt-4 whitespace-pre-wrap text-right min-w-[25px] border-r border-solid bg-neutral-900 border-r-neutral-600 left-0 top-0 text-neutral-300 h-full transition-all duration-200;
+}
+
+.editor-code:after {
+  content: attr(data-highlight-language);
+  /* top: 2%;
+  right: 5px;
+  padding: 3px;
+  font-size: 10px;
+  text-transform: uppercase;
+  position: absolute;
+  color: rgba(0, 0, 0, 0.5); */
+
+  @apply absolute text-neutral-200 text-opacity-40 bg-opacity-0 bg-neutral-700 rounded-sm top-0 right-1 p-1 text-[10px] uppercase transition-all duration-200;
+}
+
+.editor-code:hover,
+.editor-code:hover:before {
+  @apply pt-6;
+}
+
+.editor-code:hover:after {
+  @apply text-xs top-1 text-opacity-80;
+}
+
+.editor-tokenComment {
+  /* color: slategray; */
+
+  @apply text-slate-500 dark:text-slate-400;
+}
+
+.editor-tokenPunctuation {
+  /* color: #999; */
+
+  @apply text-stone-500 dark:text-stone-400;
+}
+
+.editor-tokenProperty {
+  /* color: #905; */
+
+  @apply text-pink-800 dark:text-pink-600;
+}
+
+.editor-tokenSelector {
+  /* color: #690; */
+
+  @apply text-lime-700 dark:text-lime-500;
+}
+
+.editor-tokenOperator {
+  /* color: #9a6e3a; */
+
+  @apply text-yellow-800 dark:text-yellow-500;
+}
+
+.editor-tokenAttr {
+  /* color: #07a; */
+
+  @apply text-sky-700 dark:text-sky-600;
+}
+
+.editor-tokenVariable {
+  /* color: #e90; */
+
+  @apply text-amber-500;
+}
+
+.editor-tokenFunction {
+  /* color: #dd4a68; */
+
+  @apply text-red-500;
+}
+
+.editor-paragraph {
+  /* margin: 0; */
+  /* margin-bottom: 8px; */
+  /* position: relative; */
+
+  @apply relative m-0 mb-2 last:mb-0;
+}
+
+/* .editor-paragraph:last-child {
+  margin-bottom: 0;
+} */
+
+.editor-heading-h1 {
+  /* font-size: 24px;
+  color: rgb(5, 5, 5);
+  font-weight: 400;
+  margin: 0;
+  margin-bottom: 12px;
+  padding: 0; */
+
+  @apply p-0 m-0 mb-3 text-3xl font-medium text-neutral-200;
+}
+
+.editor-heading-h2 {
+  /* font-size: 15px;
+  color: rgb(101, 103, 107);
+  font-weight: 700;
+  margin: 0;
+  margin-top: 10px;
+  padding: 0;
+  text-transform: uppercase; */
+
+  @apply p-0 m-0 mt-2 text-xl font-bold uppercase text-neutral-200;
+}
+
+.editor-quote {
+  /* margin: 0;
+  margin-left: 20px;
+  font-size: 15px;
+  color: rgb(101, 103, 107);
+  border-left-color: rgb(206, 208, 212);
+  border-left-width: 4px;
+  border-left-style: solid;
+  padding-left: 16px; */
+
+  /* @apply pl-2 pr-1 m-0 text-base bg-opacity-75 border-l-4 border-solid rounded-r-sm text-neutral-900 bg-neutral-50 border-l-neutral-50; */
+  @apply p-1 pl-2 m-0 mb-2 text-base font-light bg-opacity-75 border-l-4 border-solid rounded-r-sm text-neutral-50 bg-neutral-900 border-l-neutral-50;
+}
+
+.editor-quote .editor-text-bold {
+  @apply font-normal;
+}
+
+.editor-list-ol {
+  /* padding: 0;
+  margin: 0;
+  margin-left: 16px; */
+
+  @apply p-0 m-0 list-decimal;
+}
+
+.editor-list-ul {
+  /* padding: 0;
+  margin: 0;
+  margin-left: 16px; */
+
+  @apply p-0 m-0 list-disc;
+}
+
+.editor-listitem {
+  /* margin: 8px 32px 8px 32px; */
+
+  @apply mx-8 my-2;
+}
+
+.editor-nested-listitem {
+  /* list-style-type: none; */
+
+  @apply list-none;
+}
+
+pre::-webkit-scrollbar {
+  background: transparent;
+  width: 10px;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: #999;
+}

@@ -1,5 +1,11 @@
-import React from "react";
-import { UseFormRegister, UseFormRegisterReturn } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import {
+  UseFormRegister,
+  UseFormRegisterReturn,
+  useForm,
+} from "react-hook-form";
+import IconButton from "./IconButton";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 interface TextInputProps {
   placeholder?: string;
@@ -10,6 +16,7 @@ interface TextInputProps {
   register?: UseFormRegisterReturn<string>;
   rounded?: boolean;
   version?: 1 | 2 | 3;
+  side?: () => void;
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -21,18 +28,42 @@ const TextInput: React.FC<TextInputProps> = ({
   register,
   rounded,
   version = 3,
+  side,
 }) => {
+  const [hover, setHover] = useState(false);
+  // useEffect(() => {
+  //   console.log("state");
+  // }, [hover]);
+
   return (
-    <input
-      {...register}
-      type="text"
-      placeholder={placeholder}
-      // value={value}
-      // onChange={onChange}
-      onKeyDownCapture={(e) => {
-        e.stopPropagation();
+    <div
+      onPointerEnter={() => {
+        side && setHover(true);
       }}
-      className={`focus:outline-none placeholder:select-none ring-offset-1 focus:ring-2 ring-opacity-80 py-1 dark:ring-offset-neutral-800 ring-neutral-200
+      onFocus={() => {
+        side && setHover(true);
+      }}
+      onBlur={() => {
+        side && setHover(false);
+      }}
+      onPointerLeave={() => {
+        side && setHover(false);
+      }}
+    >
+      <input
+        {...register}
+        type="text"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        onDoubleClick={side}
+        onFocus={() => {
+          side && setHover(true);
+        }}
+        onKeyDownCapture={(e) => {
+          e.stopPropagation();
+        }}
+        className={`focus:outline-none relative placeholder:select-none ring-offset-1 focus:ring-2 w-full ring-opacity-80 py-1 dark:ring-offset-neutral-800 ring-neutral-200
     ${className}
     ${rounded ? "rounded-full px-3" : "rounded-sm px-2"} 
     ${
@@ -50,8 +81,17 @@ const TextInput: React.FC<TextInputProps> = ({
         ? "bg-neutral-900 placeholder:text-neutral-400 text-neutral-200 selection:bg-neutral-300 selection:text-neutral-900 "
         : ""
     } `}
-      style={style}
-    />
+        style={style}
+      />
+      {side && hover && (
+        <IconButton
+          onClick={side}
+          className="absolute z-10 -translate-y-1/2 bg-red-800 hover:bg-opacity-90 lg:block hidden hover:bg-red-700 bg-opacity-70 -right-[10px] top-1/2"
+        >
+          <PlusIcon strokeWidth={3} className="w-3 h-3 rotate-45" />
+        </IconButton>
+      )}
+    </div>
   );
 };
 

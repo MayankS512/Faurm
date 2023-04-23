@@ -5,13 +5,14 @@ import {
   MemberVariant,
   TitleVariant,
 } from "@/utils/variants";
-import SortableItem from "./SortableItem";
-import DndContainer from "./DndContainer";
-import TextInput from "./TextInput";
+import Textbox from "./LexicalEditor/Textbox";
+import Fields from "./Fields";
+import Dropdown, { DropdownOption } from "./Dropdown";
+import { useFaurmStore } from "@/store/store";
 
 interface FormContainerProps {
-  id: string;
-  title?: string;
+  id: number;
+  title?: string | number;
   open?: boolean;
   onPointerDown?: () => void;
   onPointerUp?: () => void;
@@ -26,13 +27,13 @@ const FormContainer: React.FC<FormContainerProps> = ({
   onPointerUp,
   open = false,
 }) => {
-  const [count, setCount] = useState(97);
-  const [items, setItems] = useState<string[]>(["A", "B", "C", "D"]);
+  const [type, setType] = useState<"MCQ" | "MAQ" | "Text">("MCQ");
+  const setQuestion = useFaurmStore((state) => state.setQuestion);
 
   useEffect(() => {
     if (open) return;
 
-    console.log("Save Form Here!");
+    setQuestion(id, { type, fields: type !== "Text" ? [] : undefined });
   }, [open]);
 
   return (
@@ -65,34 +66,60 @@ const FormContainer: React.FC<FormContainerProps> = ({
       <div className="w-full min-w-[231.3px] h-14"></div>
       <AnimatePresence>
         {open && (
-          <DndContainer<string> items={items} setItems={setItems}>
-            {items.map((val, idx) => (
+          <>
+            <motion.div
+              variants={MemberVariant}
+              initial={"close"}
+              exit="close"
+              animate="open"
+              custom={0}
+              className="px-4 py-2 w-72"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Textbox id={id} />
+            </motion.div>
+            <motion.div
+              variants={MemberVariant}
+              initial={"close"}
+              exit="close"
+              animate="open"
+              custom={1}
+              onClick={(e) => e.stopPropagation()}
+              className="p-4"
+            >
+              <Dropdown
+                label="Field Type:"
+                name={type}
+                value={type}
+                length={3}
+                onChange={setType}
+              >
+                <DropdownOption value={"MCQ"}>MCQ</DropdownOption>
+                <DropdownOption value={"MAQ"}>MAQ</DropdownOption>
+                <DropdownOption value={"Text"}>Text</DropdownOption>
+              </Dropdown>
+            </motion.div>
+            {type !== "Text" ? (
+              <Fields id={id} />
+            ) : (
               <motion.div
                 variants={MemberVariant}
                 initial={"close"}
                 exit="close"
                 animate="open"
-                custom={idx + 1}
-                key={val}
-                className={`mx-4 my-2 ${
-                  idx + 1 === items.length ? "mb-4" : ""
-                }`}
-                onPointerDownCapture={(e) => {
-                  e.stopPropagation();
-                }}
-                onClickCapture={(e) => {
-                  e.stopPropagation();
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") e.preventDefault();
-                }}
+                custom={2}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full px-4 mt-2 mb-3"
               >
-                <SortableItem className="rounded-sm" id={val}>
-                  <TextInput version={1} />
-                </SortableItem>
+                <textarea
+                  className="w-full p-2 rounded-sm resize-none sm:h-full placeholder:text-neutral-400 placeholder:opacity-70 hover:cursor-not-allowed"
+                  rows={4}
+                  disabled
+                  placeholder="Answer Field"
+                ></textarea>
               </motion.div>
-            ))}
-          </DndContainer>
+            )}
+          </>
         )}
       </AnimatePresence>
     </motion.form>

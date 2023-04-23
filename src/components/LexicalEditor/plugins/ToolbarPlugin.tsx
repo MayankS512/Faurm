@@ -488,7 +488,8 @@ export default function ToolbarPlugin(): JSX.Element {
 
   return (
     <div
-      className="flex items-center gap-2 p-2 text-neutral-200 "
+      onPointerDownCapture={(e) => e.stopPropagation()}
+      className="flex items-center w-full gap-2 p-2 text-neutral-200"
     >
       {/* <IconButton
         disabled={!canUndo || !isEditable}
@@ -541,7 +542,7 @@ export default function ToolbarPlugin(): JSX.Element {
         </Dropdown>
       ) : (
         // TODO: Style the buttons better, maybe use icons instead of text.
-        <>
+        <div className="flex gap-4 overflow-x-auto hidden-scroll">
           <IconButton
             disabled={!isEditable}
             onClick={() =>
@@ -549,6 +550,7 @@ export default function ToolbarPlugin(): JSX.Element {
             }
             title="Bold"
             label="Format text as bold."
+            active={isBold}
           >
             <span className="font-extrabold">B</span>
           </IconButton>
@@ -559,6 +561,7 @@ export default function ToolbarPlugin(): JSX.Element {
             }
             title="Italic"
             label="Format text as Italics."
+            active={isItalic}
           >
             <span className="italic">I</span>
           </IconButton>
@@ -569,6 +572,7 @@ export default function ToolbarPlugin(): JSX.Element {
             }
             title="Underline"
             label="Format text to be underlined."
+            active={isUnderline}
           >
             <span className="underline">U</span>
           </IconButton>
@@ -579,6 +583,7 @@ export default function ToolbarPlugin(): JSX.Element {
             }
             title="Strikethrough"
             label="Format text with a line through."
+            active={isStrikethrough}
           >
             <span className="line-through">S</span>
           </IconButton>
@@ -589,6 +594,7 @@ export default function ToolbarPlugin(): JSX.Element {
             }
             title="Code"
             label="Format text as code."
+            active={isCode}
           >
             <CodeBracketIcon className="icon" strokeWidth={2} />
           </IconButton>
@@ -598,11 +604,12 @@ export default function ToolbarPlugin(): JSX.Element {
               onClick={insertLink}
               title="Link"
               label="Insert Link."
+              active={isLink}
             >
               <LinkIcon className="icon" strokeWidth={2} />
             </IconButton> 
           */}
-        </>
+        </div>
       )}
 
       {/* //* Align Tools */}
