@@ -29,10 +29,11 @@ export class CustomKeyboardSensor extends KeyboardSensor {
     {
       eventName: "onKeyDown" as const,
       handler: ({ nativeEvent: event }: KeyboardEvent<Element>) => {
-        // const allowList = ["Enter", " ", "ArrowLeft", "ArrowRight"];
+        const allowList = ["Enter", " ", "ArrowLeft", "ArrowRight"];
 
-        // if (!allowList.includes(event.key)) return false;
-        return shouldHandleEvent(event.target as HTMLElement);
+        if (!allowList.includes(event.key)) return false;
+        if (!shouldHandleEvent(event.target as HTMLElement)) return false;
+        return true;
       },
     },
   ];

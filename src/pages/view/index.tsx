@@ -1,12 +1,19 @@
 import Head from "next/head";
 import { Inter } from "next/font/google";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export default function View() {
   const { data: session } = useSession();
+  // if (!session?.user) {
+  //   router.push("/");
+  // }
+
+  const faurms = trpc.faurm.getFaurms.useQuery();
+  console.log(faurms.data?.faurms);
 
   return (
     <>
@@ -50,34 +57,27 @@ export default function Home() {
       </div>
       <main className="flex flex-col items-center justify-center w-full h-screen bg-gradient-to-br from-neutral-900 to-neutral-950">
         <h1 className={`${inter.className} text-6xl`}>Faurm</h1>
-        <ul className="flex flex-col items-center gap-4 p-4 mt-20 text-xl text-center">
-          <li className="w-full">
-            <Link
-              href="/create"
-              className="block w-full p-4 py-2 rounded-sm bg-neutral-800"
-            >
-              Create New Faurm
+        {faurms.data?.faurms && faurms.data?.faurms.length ? (
+          <ul className="flex flex-col items-center gap-4 p-4 mt-20 text-xl text-center">
+            {faurms.data?.faurms.map((faurm, idx) => (
+              <li key={idx} className="w-full">
+                <Link
+                  href={`/view/${faurm.id}`}
+                  className="block w-full p-4 py-2 rounded-sm bg-neutral-800"
+                >
+                  {faurm.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="flex flex-col items-center gap-6 p-4 mt-20 text-xl bg-neutral-800 bg-opacity-70">
+            <p>No Faurms Found... :(</p>
+            <Link className="p-2 py-1 rounded-sm bg-neutral-700" href="/">
+              To Homepage
             </Link>
-          </li>
-          {session ? (
-            <li className="w-full">
-              <Link
-                href="/view"
-                className="block w-full p-4 py-2 rounded-sm bg-neutral-800"
-              >
-                View Existing Faurms
-              </Link>
-            </li>
-          ) : null}
-          {/* <li className="w-full">
-            <Link
-              href="/faurm"
-              className="block w-full p-4 py-2 rounded-sm bg-neutral-800"
-            >
-              Fill A Faurm
-            </Link>
-          </li> */}
-        </ul>
+          </div>
+        )}
       </main>
     </>
   );

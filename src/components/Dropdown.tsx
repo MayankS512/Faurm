@@ -1,13 +1,15 @@
 import React, { MouseEvent, use, useEffect, useRef, useState } from "react";
 import { Listbox, Portal } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-// import { useStore } from "../store/store";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
+
+// ? This needs to be reworked into a better component, a lot of unused code that might be useful later.
+// * Ideally, need native dropdown behavior on mobile devices while showing a custom dropdown (which this is) on desktops.
 
 interface DropdownProps {
   value: any;
   onChange?: (value: any) => void;
   disabled?: boolean;
-  name: React.ReactNode;
+  name: string;
   children?: React.ReactNode;
   label?: string;
   length?: number;
@@ -45,7 +47,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   children,
   length = 6,
 }) => {
-  const btnRef = useRef<HTMLDivElement>(null);
+  // const btnRef = useRef<HTMLDivElement>(null);
   // const optionsRef = useRef<HTMLElement>(null);
 
   // const close = useStore((state) => state.close);
@@ -99,14 +101,16 @@ const Dropdown: React.FC<DropdownProps> = ({
     <Listbox value={value} onChange={onChange} disabled={disabled}>
       {({ open }) => (
         <div
-          className={`flex items-center min-w-0 gap-2 sm:w-full lg:w-auto ${
-            name === "Code Block" ? "" : "first:lg:flex-shrink-0"
-          }`}
+          // sm:w-full lg:w-auto
+          className={`flex items-center ${
+            name.length > 8 ? "first:min-w-[120px]" : "first:min-w-fit"
+          } flex-grow min-w-0 gap-2`}
         >
           {label && (
             <Listbox.Label className="w-full min-w-fit">{label}</Listbox.Label>
           )}
-          <div ref={btnRef} className="relative w-full select-none">
+          {/*  ref={btnRef} */}
+          <div className="relative w-full select-none">
             <Listbox.Button
               onKeyDown={(e) => {
                 // e.stopPropagation();

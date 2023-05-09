@@ -2,140 +2,115 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --max-width: 1100px;
-  --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
-    "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
-    "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
-
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-
-  --primary-glow: conic-gradient(
-    from 180deg at 50% 50%,
-    #16abff33 0deg,
-    #0885ff33 55deg,
-    #54d6ff33 120deg,
-    #0071ff33 160deg,
-    transparent 360deg
-  );
-  --secondary-glow: radial-gradient(
-    rgba(255, 255, 255, 1),
-    rgba(255, 255, 255, 0)
-  );
-
-  --tile-start-rgb: 239, 245, 249;
-  --tile-end-rgb: 228, 232, 233;
-  --tile-border: conic-gradient(
-    #00000080,
-    #00000040,
-    #00000030,
-    #00000020,
-    #00000010,
-    #00000010,
-    #00000080
-  );
-
-  --callout-rgb: 238, 240, 241;
-  --callout-border-rgb: 172, 175, 176;
-  --card-rgb: 180, 185, 188;
-  --card-border-rgb: 131, 134, 135;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-
-    --primary-glow: radial-gradient(rgba(1, 65, 255, 0.4), rgba(1, 65, 255, 0));
-    --secondary-glow: linear-gradient(
-      to bottom right,
-      rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0.3)
-    );
-
-    --tile-start-rgb: 2, 13, 46;
-    --tile-end-rgb: 2, 5, 19;
-    --tile-border: conic-gradient(
-      #ffffff80,
-      #ffffff40,
-      #ffffff30,
-      #ffffff20,
-      #ffffff10,
-      #ffffff10,
-      #ffffff80
-    );
-
-    --callout-rgb: 20, 20, 20;
-    --callout-border-rgb: 108, 108, 108;
-    --card-rgb: 100, 100, 100;
-    --card-border-rgb: 200, 200, 200;
-  }
-}
-
-* {
+.loader {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: block;
+  margin: 15px auto;
+  position: relative;
+  color: #fff;
   box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+  animation: animloader 2s linear infinite;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+@keyframes animloader {
+  0% {
+    box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 -2px;
   }
+  25% {
+    box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 2px;
+  }
+  50% {
+    box-shadow: 14px 0 0 -2px, 38px 0 0 -2px, -14px 0 0 2px, -38px 0 0 -2px;
+  }
+  75% {
+    box-shadow: 14px 0 0 2px, 38px 0 0 -2px, -14px 0 0 -2px, -38px 0 0 -2px;
+  }
+  100% {
+    box-shadow: 14px 0 0 -2px, 38px 0 0 2px, -14px 0 0 -2px, -38px 0 0 -2px;
+  }
+}
+
+/* .alt-loader {
+  border: 24px solid;
+  border-color: rgba(255, 255, 255, 0.15) rgba(255, 255, 255, 0.25)
+    rgba(255, 255, 255, 0.35) rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: animloader 1s linear infinite;
+}
+
+@keyframes altAnimloader {
+  0% {
+    border-color: rgba(255, 255, 255, 0.15) rgba(255, 255, 255, 0.25)
+      rgba(255, 255, 255, 0.35) rgba(255, 255, 255, 0.75);
+  }
+  33% {
+    border-color: rgba(255, 255, 255, 0.75) rgba(255, 255, 255, 0.15)
+      rgba(255, 255, 255, 0.25) rgba(255, 255, 255, 0.35);
+  }
+  66% {
+    border-color: rgba(255, 255, 255, 0.35) rgba(255, 255, 255, 0.75)
+      rgba(255, 255, 255, 0.15) rgba(255, 255, 255, 0.25);
+  }
+  100% {
+    border-color: rgba(255, 255, 255, 0.25) rgba(255, 255, 255, 0.35)
+      rgba(255, 255, 255, 0.75) rgba(255, 255, 255, 0.15);
+  }
+} */
+
+body {
+  @apply w-screen h-screen dark:bg-neutral-900 dark:text-neutral-200;
 }
 
 .icon {
   @apply w-5 h-5 p-[2px];
 }
 
-.dropdown-scroll::-webkit-scrollbar {
+.hidden-scroll::-webkit-scrollbar {
+  @apply hidden;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  @apply h-2;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+  @apply ml-10 bg-transparent;
+}
+
+.horizontal-scroll[data-horizontal]::-webkit-scrollbar-track {
+  @apply ml-0 bg-transparent;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+  @apply bg-neutral-700;
+}
+
+.horizontal-scroll[data-horizontal="false"]::-webkit-scrollbar-thumb {
+  @apply bg-transparent;
+}
+.horizontal-scroll[data-horizontal="true"]::-webkit-scrollbar-thumb {
+  @apply transition-all duration-200 bg-neutral-700;
+}
+
+.dropdown-scroll::-webkit-scrollbar,
+.editor-scroll::-webkit-scrollbar {
   @apply w-2;
 }
 
 .dropdown-scroll::-webkit-scrollbar-track {
-  @apply rounded-r-sm bg-neutral-800;
+  @apply bg-transparent rounded-r-sm;
 }
 
 .dropdown-scroll::-webkit-scrollbar-thumb {
   @apply rounded-r-sm bg-neutral-700;
 }
 
-.hidden-scroll::-webkit-scrollbar {
-  @apply hidden;
-}
-
-.editor-scroll::-webkit-scrollbar {
-  @apply w-2;
-}
-
 .editor-scroll::-webkit-scrollbar-track {
-  @apply rounded-br-sm bg-neutral-700;
+  @apply bg-transparent rounded-br-sm;
 }
 
 .editor-scroll::-webkit-scrollbar-thumb {
@@ -194,7 +169,7 @@ editor-list-ol.editor-placeholder {
   /* font-family: Menlo, Consolas, Monaco, monospace; */
   /* font-size: 94%; */
 
-  @apply bg-neutral-900 rounded-sm text-neutral-200 p-1 font-mono text-[94%];
+  @apply bg-neutral-950 rounded-sm text-neutral-200 p-1 font-mono text-[94%];
 }
 
 .editor-link {
@@ -220,7 +195,7 @@ editor-list-ol.editor-placeholder {
   /* position: relative; */
 
   /* overflow-x-auto whitespace-nowrap */
-  @apply relative block p-2 pt-4 pl-12 m-0 my-2 font-mono text-sm transition-all duration-200 rounded-sm text-neutral-200 bg-neutral-900;
+  @apply relative block p-2 pt-4 pl-12 m-0 my-2 font-mono text-sm transition-all duration-200 rounded-sm text-neutral-200 bg-neutral-950;
 }
 
 .editor-code:before {
@@ -236,7 +211,7 @@ editor-list-ol.editor-placeholder {
   /* text-align: right; */
   /* min-width: 25px; */
 
-  @apply absolute p-2 pt-4 whitespace-pre-wrap text-right min-w-[25px] border-r border-solid bg-neutral-900 border-r-neutral-600 left-0 top-0 text-neutral-300 h-full transition-all duration-200;
+  @apply absolute p-2 pt-4 whitespace-pre-wrap text-right min-w-[25px] border-r border-solid bg-neutral-950 border-r-neutral-600 left-0 top-0 text-neutral-300 h-full transition-all duration-200;
 }
 
 .editor-code:after {
@@ -355,7 +330,7 @@ editor-list-ol.editor-placeholder {
   padding-left: 16px; */
 
   /* @apply pl-2 pr-1 m-0 text-base bg-opacity-75 border-l-4 border-solid rounded-r-sm text-neutral-900 bg-neutral-50 border-l-neutral-50; */
-  @apply p-1 pl-2 m-0 mb-2 text-base font-light bg-opacity-75 border-l-4 border-solid rounded-r-sm text-neutral-50 bg-neutral-900 border-l-neutral-50;
+  @apply p-1 pl-2 m-0 mb-2 text-base font-light bg-opacity-75 border-l-4 border-solid rounded-r-sm text-neutral-50 bg-neutral-950 border-l-neutral-50;
 }
 
 .editor-quote .editor-text-bold {

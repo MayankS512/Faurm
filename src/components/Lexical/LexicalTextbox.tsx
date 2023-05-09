@@ -1,11 +1,6 @@
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
-
-import {
-  $getRoot,
-  $getSelection,
-  $setSelection,
-  type EditorState,
-} from "lexical";
+import { AnimatePresence, motion } from "framer-motion";
+import type { EditorState } from "lexical";
 import type { InitialConfigType } from "@lexical/react/LexicalComposer";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -19,20 +14,14 @@ import { TRANSFORMERS } from "@lexical/markdown";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
-import { AutoLinkNode, LinkNode } from "@lexical/link";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import { EQUATION } from "./plugins/EquationPlugin/EquationTransformer";
 import { EquationNode } from "./plugins/EquationPlugin/EquationNode";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
-import { AnimatePresence, motion } from "framer-motion";
-import { useFaurmStore } from "@/store/store";
-// import { useStore } from "../store/store";
 
 const theme = {
   ltr: "ltr",
@@ -99,79 +88,54 @@ const theme = {
   },
 };
 
-const defaultState =
+export const defaultTextboxState =
   '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}';
 
-function onChange(editorState: EditorState) {
-  editorState.read(() => {
-    const root = $getRoot();
-    const selection = $getSelection();
+// export const defaultTextboxState =
+//   '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Question","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}';
 
-    console.log(root, selection);
-  });
-}
+// function MyCustomAutoFocusPlugin() {
+//   const [editor] = useLexicalComposerContext();
 
-// TODO: Test if this save on blur works without toolbar state, if it doesn't, add it back to the dependancy.
-function MyCustomAutoFocusPlugin({}: // toolbar,
-{
-  // toolbar: boolean;
-}) {
-  const [editor] = useLexicalComposerContext();
-  const questions = useFaurmStore((state) => state.questions);
+//   useEffect(() => {
+//     editor.update(() => {
+//       $setSelection(null);
+//     });
+//   }, [editor]);
 
-  useEffect(() => {
-    // editor.focus();
-    // setForm({
-    //   // question: JSON.stringify(editor.getEditorState()),
-    //   question: editor.getEditorState(),
-    //   options: [],
-    // });
-    editor.update(() => {
-      $setSelection(null);
-    });
-  }, [editor]);
-
-  return null;
-}
+//   return null;
+// }
 
 function onError(error: any) {
   console.error(error);
 }
 
-const Placeholder: React.FC = () => (
+const Placeholder: React.FC<{ placeholder?: string }> = ({ placeholder }) => (
   <div className="absolute top-0 left-0 z-0 inline-block w-full p-2 overflow-hidden pointer-events-none select-none whitespace-nowrap text-neutral-400 text-ellipsis">
-    Enter Question Here...
+    {placeholder ?? "Enter Text Here..."}
   </div>
 );
 
-const Textbox: React.FC<{
-  id: number;
-}> = ({ id }) => {
-  // const setClose = useStore((state) => state.setClose);
-  // const form = useStore((state) => state.form);
-  // const form = useStore((state) => state.forms.get(id));
+const LexicalTextbox: React.FC<{
+  id: string;
+  editorStateRef?: MutableRefObject<string | undefined>;
+  placeholder?: string;
+  minHeight?: string | number;
+}> = ({ id, editorStateRef, placeholder, minHeight }) => {
   const eState = useRef<EditorState>();
-  const questions = useFaurmStore((state) => state.questions);
-  const question = questions.get(id);
-  const setQuestion = useFaurmStore((state) => state.setQuestion);
+
   const timeout = useRef<NodeJS.Timeout>();
   let t: NodeJS.Timeout;
   const [toolbar, setToolbar] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
-  // const setToolbar = useFaurmStore((state) => state.setToolbar);
-  // const toolbar = useFaurmStore((state) => state.toolbar);
-
   useEffect(() => {
     return () => {
       if (!eState.current) return;
-      // questions.set(id, {
-      //   title: eState.current.toJSON(),
-      //   type: "Text",
-      // });
-      setQuestion(id, { title: eState.current.toJSON() });
+      if (editorStateRef)
+        editorStateRef.current = JSON.stringify(eState.current);
     };
-  }, [id, questions, setQuestion]);
+  }, [id, editorStateRef]);
 
   useEffect(() => {
     setDisabled(false);
@@ -188,18 +152,17 @@ const Textbox: React.FC<{
       QuoteNode,
       CodeNode,
       CodeHighlightNode,
-      TableNode,
-      TableCellNode,
-      TableRowNode,
-      AutoLinkNode,
-      LinkNode,
       EquationNode,
     ],
     editorState(editor) {
-      if (!question || !question.title)
-        return editor.setEditorState(editor.parseEditorState(defaultState));
+      if (!editorStateRef || !editorStateRef.current)
+        return editor.setEditorState(
+          editor.parseEditorState(defaultTextboxState)
+        );
 
-      return editor.setEditorState(editor.parseEditorState(question?.title));
+      return editor.setEditorState(
+        editor.parseEditorState(editorStateRef.current)
+      );
     },
   };
 
@@ -214,22 +177,19 @@ const Textbox: React.FC<{
   // ? Considering they already have !isEditable as disabled, the property would look like: (!isEditable || disabled)
 
   return (
+    // TODO: Implement a word limit
     <LexicalComposer initialConfig={initialConfig}>
       <div
-        // onPointerDownCapture={(e) => e.stopPropagation()}
+        onKeyDownCapture={(e) => e.stopPropagation()}
         data-no-dnd="true"
         onBlur={() => {
-          // if (toolbarRef.current) toolbarRef.current(false);
           timeout.current = setTimeout(() => {
             setToolbar(false);
           }, 100);
 
           if (!eState.current) return;
-          // questions.set(id, {
-          //   title: eState.current.toJSON(),
-          //   type: "Text",
-          // });
-          setQuestion(id, { title: eState.current.toJSON() });
+          if (editorStateRef)
+            editorStateRef.current = JSON.stringify(eState.current);
         }}
         onFocus={(e) => {
           if (disabled) {
@@ -238,12 +198,9 @@ const Textbox: React.FC<{
           }
 
           clearTimeout(timeout.current);
-
-          // if (toolbarRef.current) toolbarRef.current(true);
-
           setToolbar(true);
         }}
-        className={`flex flex-col h-full rounded-sm  w-full bg-neutral-800 ring-offset-1  ring-offset-neutral-900 ring-neutral-200 ${
+        className={`flex flex-col h-full rounded-sm max-w-[256px] bg-neutral-800 ring-offset-1 ring-offset-neutral-900 ring-neutral-200 ${
           toolbar ? "ring-2" : ""
         }`}
       >
@@ -264,18 +221,15 @@ const Textbox: React.FC<{
             contentEditable={
               <ContentEditable
                 aria-required
+                style={{ minHeight }}
                 className="p-2 overflow-y-auto rounded-sm outline-none editor-scroll max-h-40 "
               />
             }
-            placeholder={Placeholder}
+            placeholder={<Placeholder placeholder={placeholder} />}
             ErrorBoundary={LexicalErrorBoundary}
           />
           <OnChangePlugin
             onChange={(editorState) => {
-              // questions.set(id, {
-              //   title: editorState.toJSON(),
-              //   type: "Text",
-              // });
               eState.current = editorState;
             }}
           />
@@ -290,4 +244,4 @@ const Textbox: React.FC<{
     </LexicalComposer>
   );
 };
-export default Textbox;
+export default LexicalTextbox;

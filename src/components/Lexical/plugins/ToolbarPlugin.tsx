@@ -5,7 +5,6 @@ import {
   CODE_LANGUAGE_MAP,
   getLanguageFriendlyName,
 } from "@lexical/code";
-import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import {
   $isListNode,
   INSERT_ORDERED_LIST_COMMAND,
@@ -70,16 +69,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import {
-  ArrowUturnLeftIcon,
-  ArrowUturnRightIcon,
-  Bars3BottomLeftIcon,
-  Bars3BottomRightIcon,
-  Bars3Icon,
-  ChevronDownIcon,
-  CodeBracketIcon,
-  LinkIcon,
-} from "@heroicons/react/24/outline";
+import { CodeIcon } from "@radix-ui/react-icons";
 import IconButton from "../../IconButton";
 import Dropdown, { DropdownOption } from "../../Dropdown";
 import { motion } from "framer-motion";
@@ -353,11 +343,11 @@ export default function ToolbarPlugin(): JSX.Element {
       // Update links
       const node = getSelectedNode(selection);
       const parent = node.getParent();
-      if ($isLinkNode(parent) || $isLinkNode(node)) {
-        setIsLink(true);
-      } else {
-        setIsLink(false);
-      }
+      // if ($isLinkNode(parent) || $isLinkNode(node)) {
+      //   setIsLink(true);
+      // } else {
+      //   setIsLink(false);
+      // }
 
       if (elementDOM !== null) {
         setSelectedElementKey(elementKey);
@@ -464,13 +454,13 @@ export default function ToolbarPlugin(): JSX.Element {
     });
   }, [activeEditor]);
 
-  const insertLink = useCallback(() => {
-    if (!isLink) {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl("https://"));
-    } else {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
-    }
-  }, [editor, isLink]);
+  // const insertLink = useCallback(() => {
+  //   if (!isLink) {
+  //     editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl("https://"));
+  //   } else {
+  //     editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+  //   }
+  // }, [editor, isLink]);
 
   const onCodeLanguageSelect = useCallback(
     (value: string) => {
@@ -596,7 +586,7 @@ export default function ToolbarPlugin(): JSX.Element {
             label="Format text as code."
             active={isCode}
           >
-            <CodeBracketIcon className="icon" strokeWidth={2} />
+            <CodeIcon className="icon" strokeWidth={2} />
           </IconButton>
           {/* // TODO: Either Remove this or add a way to change url for link. */}
           {/* <IconButton

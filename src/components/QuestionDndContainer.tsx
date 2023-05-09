@@ -18,9 +18,14 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {} from "@dnd-kit/modifiers";
 import React, { useState } from "react";
-import { CustomMouseSensor, CustomTouchSensor } from "@/utils/sensors";
+import {
+  CustomMouseSensor,
+  CustomTouchSensor,
+} from "@/utils/sensors";
+import { TRPCOutputs } from "@/utils/trpc";
+
+// ? This will be used in the mobile layout too, if that stays as a separate component having this as a component will be useful, otherwise could be merged with Question component although since this contains a lot of code, may still be better to keep it here.
 
 // Pass in a single function or 2 functions in an array or object.
 type KeyboardEvents =
@@ -31,28 +36,26 @@ type KeyboardEvents =
       end?: { (): void };
     };
 
-interface DndContainerProps<T> {
+type Faurm = Exclude<TRPCOutputs["faurm"]["getFaurm"]["faurm"], null>;
+type Question = Faurm["questions"][0];
+
+interface QuestionDndContainerProps {
   children?: React.ReactNode;
-  setItems: React.Dispatch<React.SetStateAction<Array<T>>>;
-  items: Array<T>;
-  setDrag?: React.Dispatch<React.SetStateAction<UniqueIdentifier | undefined>>;
+  setQuestions: React.Dispatch<React.SetStateAction<Array<Question>>>;
+  questions: Array<Question>;
   orientation?: "horizontal" | "vertical" | "grid";
-  Overlay?: React.JSXElementConstructor<{
-    children?: React.ReactNode;
-    dragging?: string;
-  }>;
+  Overlay?: React.JSXElementConstructor<{ dragging: number }>;
   keyboardEvents?: KeyboardEvents;
 }
 
-function DndContainer<T>({
+const QuestionDndContainer: React.FC<QuestionDndContainerProps> = ({
   children,
-  setItems,
-  items,
-  setDrag,
-  orientation = "vertical",
+  setQuestions,
+  questions,
+  orientation = "horizontal",
   Overlay,
   keyboardEvents,
-}: DndContainerProps<T>): React.ReactElement {
+}) => {
   const [dragging, setDragging] = useState<UniqueIdentifier>();
 
   const sensors = useSensors(
@@ -96,17 +99,16 @@ function DndContainer<T>({
     if (!over) return;
 
     if (active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id as T);
-        const newIndex = items.indexOf(over.id as T);
+      setQuestions((questions) => {
+        const oldIndex = questions.findIndex((field) => field.id === active.id);
+        const newIndex = questions.findIndex((field) => field.id === over.id);
 
-        return arrayMove(items, oldIndex, newIndex);
+        return arrayMove(questions, oldIndex, newIndex);
       });
     }
 
     if (!Overlay) return;
     setDragging(undefined);
-    if (setDrag) setDrag(undefined);
   };
 
   const handleDragStart = (e: DragStartEvent) => {
@@ -114,7 +116,6 @@ function DndContainer<T>({
 
     const { active } = e;
     setDragging(active.id);
-    if (setDrag) setDrag(active.id);
   };
 
   const currentStrategy: () => SortingStrategy = () => {
@@ -137,20 +138,26 @@ function DndContainer<T>({
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
       onDragStart={handleDragStart}
+      modifiers={
+        [
+          // restrictToHorizontalAxis,
+          // restrictToFirstScrollableAncestor,
+          // restrictToParentElement,
+        ]
+      }
     >
-      <SortableContext
-        items={items as UniqueIdentifier[]}
-        strategy={currentStrategy()}
-      >
+      <SortableContext items={questions} strategy={currentStrategy()}>
         {children}
       </SortableContext>
       {Overlay && (
         <DragOverlay>
-          <Overlay dragging={dragging?.toString()}>{dragging}</Overlay>
+          <Overlay
+            dragging={questions.findIndex((val) => val.id === dragging)}
+          />
         </DragOverlay>
       )}
     </DndContext>
   );
-}
+};
 
-export default DndContainer;
+export default QuestionDndContainer;

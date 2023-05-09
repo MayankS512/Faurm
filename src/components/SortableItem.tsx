@@ -1,5 +1,4 @@
 import { useSortable } from "@dnd-kit/sortable";
-import { useEffect } from "react";
 
 interface SortableItemProps {
   id: string | number;
@@ -32,6 +31,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
 
   return (
     <div
+      onKeyDownCapture={(e) => {
+        if (isDragging) {
+          e.preventDefault();
+        }
+      }}
       onPointerDownCapture={(e) => {
         if (!isDragging) e.stopPropagation();
       }}
@@ -39,9 +43,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`${
-        isDragging ? "opacity-60 z-50" : ""
-      } ${className} focus:outline-none focus-visible:ring-2 ring-offset-1 ring-neutral-400 ring-opacity-60 ring-offset-transparent`}
+      className={`${isDragging ? `opacity-60 z-50` : ""} ${className} `}
     >
       {children}
     </div>

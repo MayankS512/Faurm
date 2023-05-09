@@ -1,11 +1,7 @@
-import React, { useEffect, useState } from "react";
-import {
-  UseFormRegister,
-  UseFormRegisterReturn,
-  useForm,
-} from "react-hook-form";
+import React, { useState } from "react";
 import IconButton from "./IconButton";
-import { PlusIcon } from "@heroicons/react/24/outline";
+
+// ? This needs repurposing, currently not used anywhere but could be useful.
 
 interface TextInputProps {
   placeholder?: string;
@@ -13,7 +9,6 @@ interface TextInputProps {
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
   className?: string;
   style?: React.CSSProperties;
-  register?: UseFormRegisterReturn<string>;
   rounded?: boolean;
   version?: 1 | 2 | 3;
   side?: () => void;
@@ -25,7 +20,6 @@ const TextInput: React.FC<TextInputProps> = ({
   onChange,
   className,
   style,
-  register,
   rounded,
   version = 3,
   side,
@@ -51,7 +45,6 @@ const TextInput: React.FC<TextInputProps> = ({
       }}
     >
       <input
-        {...register}
         type="text"
         placeholder={placeholder}
         value={value}
@@ -88,7 +81,6 @@ const TextInput: React.FC<TextInputProps> = ({
           onClick={side}
           className="absolute z-10 -translate-y-1/2 bg-red-800 hover:bg-opacity-90 lg:block hidden hover:bg-red-700 bg-opacity-70 -right-[10px] top-1/2"
         >
-          <PlusIcon strokeWidth={3} className="w-3 h-3 rotate-45" />
         </IconButton>
       )}
     </div>

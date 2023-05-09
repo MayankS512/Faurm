@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import Textbox from "./LexicalEditor/Textbox";
-import Fields from "./Fields";
+import LexicalTextbox from "./Lexical/LexicalTextbox";
 
-const TemplateForm: React.FC<{
+// ? This contians the mobile layout for a faurm, currently not being used anywhere.
+
+const MobileFaurm: React.FC<{
   title?: string | number;
   id: number;
 }> = ({ title = "Z", id }) => {
@@ -17,12 +18,7 @@ const TemplateForm: React.FC<{
     >
       <div className="flex flex-col items-center w-full min-h-[12rem] gap-4 touch-pan-y">
         <h2 className="text-xl">{title}.</h2>
-        {/* <textarea
-          className="w-full p-2 rounded-sm resize-none touch-pan-y placeholder:text-neutral-400 placeholder:opacity-70"
-          rows={4}
-          placeholder="Enter Question"
-        ></textarea> */}
-        <Textbox id={id} />
+        <LexicalTextbox id={id.toString()} />
         <select
           value={type}
           onChange={(e) => setType(e.target.value as typeof type)}
@@ -35,7 +31,7 @@ const TemplateForm: React.FC<{
       </div>
       {type === "MCQ" || type === "MAQ" ? (
         <div className="flex flex-col items-center justify-center w-[calc(100%+2rem)] -mx-4 -mb-4">
-          <Fields id={id} disable blur />
+          {/* // TODO: Fields go here */}
         </div>
       ) : (
         // * Ideally should not be shown.
@@ -50,28 +46,4 @@ const TemplateForm: React.FC<{
   );
 };
 
-export default TemplateForm;
-
-// Old Inputs
-// <div className="flex flex-col items-center justify-between w-full h-full gap-4 overflow-y-auto touch-pan-y">
-//   <input
-//     type="text"
-//     className="w-full p-2 rounded-sm touch-pan-y placeholder:text-neutral-400 placeholder:opacity-70"
-//     placeholder="Input"
-//   />
-//   <input
-//     type="text"
-//     className="w-full p-2 rounded-sm touch-pan-y placeholder:text-neutral-400 placeholder:opacity-70"
-//     placeholder="Input"
-//   />
-//   <input
-//     type="text"
-//     className="w-full p-2 rounded-sm touch-pan-y placeholder:text-neutral-400 placeholder:opacity-70"
-//     placeholder="Input"
-//   />
-//   <input
-//     type="text"
-//     className="w-full p-2 rounded-sm touch-pan-y placeholder:text-neutral-400 placeholder:opacity-70"
-//     placeholder="Input"
-//   />
-// </div>
+export default MobileFaurm;

@@ -11,6 +11,7 @@ datasource db {
   relationMode = "prisma"
 }
 
+// * Next-Auth
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -49,6 +50,10 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+
+  faurms    Faurm[]    @relation(name: "faurms")
+  responses Response[]
+  filled    Faurm[]    @relation(name: "filled")
 }
 
 model VerificationToken {
@@ -57,4 +62,62 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// * Faurm
+model Faurm {
+  id        String     @id @default(cuid())
+  title     String
+  questions Question[]
+  responses Response[]
+  userId    String?
+  user      User?      @relation(fields: [userId], references: [id], name: "faurms", onDelete: Cascade)
+  filledBy  User[]     @relation(name: "filled")
+
+  @@index([userId])
+}
+
+model Question {
+  id      String   @id @default(cuid())
+  title   String   @db.Text
+  type    String
+  fields  Field[]
+  answers Answer[]
+  faurmId String
+  faurm   Faurm    @relation(fields: [faurmId], references: [id], onDelete: Cascade)
+
+  @@index([faurmId])
+}
+
+model Field {
+  id         String   @id @default(cuid())
+  value      String
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+}
+
+model Response {
+  id      String   @id @default(cuid())
+  faurmId String
+  faurm   Faurm    @relation(fields: [faurmId], references: [id], onDelete: Cascade)
+  userId  String?
+  User    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@index([faurmId])
+  @@index([userId])
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  responseId String
+  response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  value      String   @db.Text
+
+  @@index([responseId])
+  @@index([questionId])
 }

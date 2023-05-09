@@ -1,9 +1,8 @@
 import { RoundedButton } from "@/components/RoundedButton";
-import TemplateForm from "@/components/TemplateForm";
+import TemplateForm from "@/components/MobileFaurm";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import React, { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
 
 const Test = () => {
   const items = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -26,13 +25,6 @@ const Test = () => {
     setDir(-1);
     // setTuple((prev) => [prev[1], prev[1] - 1]);
   };
-
-  const { register, handleSubmit } = useForm({
-    defaultValues: {
-      normal: "Default",
-    },
-  });
-
   // const direction = tuple[1] > tuple[0]! ? 1 : -1;
   // console.log(direction);
 

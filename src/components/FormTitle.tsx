@@ -1,20 +1,23 @@
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 
-const FormTitle = () => {
+interface FormTitleProps {
+  title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const FormTitle: React.FC<FormTitleProps> = ({ title, setTitle }) => {
   const [edit, setEdit] = useState(false);
-  const [title, setTitle] = useState("Form Title");
-
-  // ? Could try replacing with useRef
-  const [old, setOld] = useState(title);
+  const old = useRef(title);
 
   return edit ? (
     <textarea
       required
-      className="w-full lg:w-full break-all min-h-[3rem] p-2 my-2 overflow-hidden text-2xl text-center rounded-sm resize-none sm:w-1/2 bg-neutral-800"
-      value={title}
+      // w-full sm:w-1/2 lg:w-full
+      className="w-full break-all min-h-[3rem] p-2 my-2 overflow-hidden text-2xl text-center rounded-sm resize-none bg-neutral-800 outline-none focus-visible:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900"
+      defaultValue={title}
       autoFocus={true}
       onChange={(e) => {
-        setTitle(e.target.value);
+        // setTitle(e.target.value);
 
         e.target.style.height = "";
         e.target.style.height = e.target.scrollHeight + "px";
@@ -24,26 +27,20 @@ const FormTitle = () => {
         e.target.style.height = e.target.scrollHeight + "px";
 
         e.target.select();
-        setOld(title);
+        // setOld(title);
+        old.current = title;
       }}
-      // onPointerDownCapture={(e) => e.stopPropagation()}
-      // onKeyDownCapture={(e) => {
-      //   if (e.key === "Enter") {
-      //     e.preventDefault();
-      //   }
-      // }}
-      // onPointerEnter={(e) => {
-      //   console.log("Entered");
-      // }}
-      rows={1}
-      onBlur={() => {
+      onBlur={(e) => {
         setEdit(false);
-        if (title === "") {
-          setTitle(old);
-        } else {
-          setTitle((prev) => prev.trim());
+        // if (e.target.value === "") {
+        //   // setTitle(old);
+        //   setTitle(old.current);
+        // } else {
+        if (e.target.value !== "") {
+          setTitle(e.target.value.trim());
         }
       }}
+      rows={1}
     ></textarea>
   ) : (
     <h1
@@ -54,7 +51,8 @@ const FormTitle = () => {
         e.preventDefault();
       }}
       onDoubleClick={() => setEdit(true)}
-      className="w-full p-2 my-2 text-2xl text-center break-all whitespace-pre-wrap lg:w-full sm:w-1/2 "
+      // w-full sm:w-1/2 lg:w-full
+      className="w-full p-2 my-2 text-2xl text-center break-all whitespace-pre-wrap rounded-sm outline-none  focus-visible:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900"
     >
       {title ?? ""}
     </h1>
