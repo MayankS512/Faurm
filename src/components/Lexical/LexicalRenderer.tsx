@@ -7,12 +7,13 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 
 import EquationsPlugin from "./plugins/EquationPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { ListItemNode, ListNode } from "@lexical/list";
+import { LinkNode } from "@lexical/link";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import { EquationNode } from "./plugins/EquationPlugin/EquationNode";
@@ -107,6 +108,7 @@ const LexicalRenderer: React.FC<{
     nodes: [
       HeadingNode,
       ListNode,
+      LinkNode,
       ListItemNode,
       QuoteNode,
       CodeNode,
@@ -140,8 +142,8 @@ const LexicalRenderer: React.FC<{
             placeholder={<Placeholder placeholder={placeholder} />}
             ErrorBoundary={LexicalErrorBoundary}
           />
-          <ListPlugin />
           <LinkPlugin />
+          <ListPlugin />
           <CodeHighlightPlugin />
           <HistoryPlugin />
           <EquationsPlugin />
