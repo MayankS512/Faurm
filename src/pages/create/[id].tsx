@@ -384,7 +384,10 @@ export function ShareModal() {
   const router = useRouter();
   const { id, share } = router.query;
 
-  const url = (process.env.VERCEL_URL ?? "http://localhost:3000/") + id;
+  const url =
+    (process.env.MODE
+      ? "http://localhost:3000/"
+      : "https://faurm.vercel.app/") + id;
 
   const [copied, setCopied] = useState(false);
   // const copiedValue = useMotionValue(0);
