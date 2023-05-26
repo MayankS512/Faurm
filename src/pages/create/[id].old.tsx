@@ -1,7 +1,7 @@
-import { trpc } from "@/utils/trpc";
+import { TRPCOutputs, trpc } from "@/utils/trpc";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import SortableItem from "@/components/SortableItem";
 import QuestionDndContainer from "@/components/QuestionDndContainer";
 import { RoundedButton } from "@/components/RoundedButton";
@@ -10,7 +10,15 @@ import {
   QuestionOverlay,
   type TQuestion,
 } from "@/components/Question";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useMotionValueEvent,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import FormTitle from "@/components/FormTitle";
 import Link from "next/link";
 import {
@@ -84,8 +92,14 @@ function Create({ faurm }: { faurm: TFaurm }) {
   const [open, setOpen] = useState<string>();
 
   const temp = useRef(open);
+  const added = useRef(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   const setFaurm = trpc.faurm.setFaurm.useMutation();
+
+  // console.log("rerender");
 
   const handleSave = async () => {
     const res = await setFaurm.mutateAsync({
@@ -108,6 +122,24 @@ function Create({ faurm }: { faurm: TFaurm }) {
     });
   };
 
+  const logger = () => {
+    console.log(
+      "Slider",
+      sliderRef.current?.clientWidth,
+      sliderRef.current?.offsetWidth,
+      sliderRef.current?.scrollWidth,
+      sliderRef.current?.offsetLeft
+    );
+    console.log(
+      "Container",
+      containerRef.current?.clientWidth,
+      containerRef.current?.offsetWidth,
+      containerRef.current?.scrollWidth,
+      containerRef.current?.scrollLeft,
+      containerRef.current?.offsetLeft
+    );
+  };
+
   const handleCreate = async () => {
     setQuestions((prev) => {
       return [
@@ -121,11 +153,74 @@ function Create({ faurm }: { faurm: TFaurm }) {
         },
       ];
     });
-  };
 
+    added.current = true;
+    // if (containerRef.current) {
+    //   containerRef.current.scrollTo({
+    //     left: scrollLimit,
+    //     behavior: "smooth",
+    //   });
+    // }
+
+    // ? Need to implement autoScroll for slider based solution
+    // if (containerRef.current && sliderRef.current) {
+    //   const OFFSET = 55; // ~50-60
+    //   x.set(
+    //     containerRef.current.clientWidth -
+    //       containerRef.current.scrollWidth -
+    //       OFFSET
+    //   );
+    // }
+
+    // ? Need to add Left Padding for scroll based solution
+    // if (containerRef.current && sliderRef.current) {
+    //   setMl(sliderRef.current.scrollWidth / 2);
+    // }
+  };
   const handleDelete = async (idx: number, id: string) => {
     setQuestions((prev) => [...prev.slice(0, idx), ...prev.slice(idx + 1)]);
   };
+
+  // const x = useMotionValue(0);
+  // const [pl, setPl] = useState(0)
+  const [compensate, setCompensate] = useState(false);
+  const [scrollLimit, setScrollLimit] = useState(0);
+  const fixScroll = useCallback(() => {
+    if (sliderRef.current && containerRef.current) {
+      const PADDING = 40;
+      const MARGIN = sliderRef.current.offsetLeft;
+      const DIFFERENCE = MARGIN - PADDING;
+      const SLIDER_WIDTH = 116 * questions.length - 16;
+      const CONTAINER_WIDTH = containerRef.current.clientWidth;
+      const OUTLINE_OFFSET = 4; // For ring / outline
+
+      const SCROLL_LIMIT =
+        SLIDER_WIDTH + DIFFERENCE * 2 - CONTAINER_WIDTH + OUTLINE_OFFSET;
+
+      setScrollLimit(SCROLL_LIMIT);
+      setCompensate(
+        containerRef.current.clientWidth + 116 <
+          containerRef.current.scrollWidth
+      );
+    }
+  }, [questions]);
+
+  useEffect(() => {
+    window.addEventListener("resize", fixScroll);
+    fixScroll();
+    return () => window.removeEventListener("resize", fixScroll);
+  }, [fixScroll]);
+
+  useEffect(() => {
+    if (!added.current) return;
+    if (containerRef.current) {
+      containerRef.current.scrollTo({
+        left: scrollLimit,
+        behavior: "smooth",
+      });
+      added.current = false;
+    }
+  }, [scrollLimit]);
 
   return (
     //  bg-gradient-to-br from-neutral-900 to-neutral-950
@@ -149,6 +244,12 @@ function Create({ faurm }: { faurm: TFaurm }) {
           Save
         </button>
       </div>
+      {/* <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="px-2 py-1 text-xl rounded-sm outline-none dark:bg-neutral-800 dark:text-neutral-200 focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 selection:bg-neutral-600"
+      /> */}
       <FormTitle title={title} setTitle={setTitle} />
       <div className="flex gap-4">
         <button
@@ -161,6 +262,32 @@ function Create({ faurm }: { faurm: TFaurm }) {
       </div>
 
       <div
+        // onWheel={(e) => {
+        //   if (!e.shiftKey) return;
+        //   let limit: number | undefined = undefined;
+        //   if (containerRef.current) {
+        //     limit =
+        //       (containerRef.current?.clientWidth -
+        //         containerRef.current?.children[0].clientWidth) /
+        //       2;
+        //   }
+
+        //   // x.stop();
+        //   if (limit) {
+        //     const uLimit = Math.max(limit, -limit);
+        //     const lLimit = Math.min(limit, -limit);
+        //     x.jump(Math.min(Math.max(x.get() - e.deltaY, lLimit), uLimit));
+        //   } else {
+        //     x.jump(x.get() - e.deltaY);
+        //   }
+        // }}
+        onScroll={(e) => {
+          if (e.currentTarget.scrollLeft > scrollLimit) {
+            e.currentTarget.scrollLeft = scrollLimit;
+            return;
+          }
+        }}
+        ref={containerRef}
         // hidden-scroll
         className="flex items-center h-[500px] overflow-x-auto overflow-y-hidden horizontal-scroll max-w-full gap-4 mt-10"
       >
@@ -169,7 +296,28 @@ function Create({ faurm }: { faurm: TFaurm }) {
             <p>No Questions...</p>
           </div>
         ) : (
-          <div className="flex items-center mx-[196px] h-full gap-4 ">
+          // -TODO: Fix a height bug when dealing with max lenght options (check question no. 3 on http://localhost:3000/create/clh1169yt0009vqd8qy1dytiv)
+          // -TODO: Fix another bug with toolbar dropdown or rewrite it completely for new design architecture.
+
+          // TODO: Ideally uses drag slider to eliminate extra padding (px-[25%]) and to make selected faurm centered. (MED PRIORITY)
+          // ? Not quite working out, might be better to stick with scroll for now...
+          <motion.div
+            initial={{ marginLeft: 196 }}
+            animate={{
+              marginLeft: compensate ? (open !== undefined ? 4 : 196 / 2) : 196,
+              // compensate ? (open !== undefined ? 4 : 196 / 2) : 196,
+              // marginRight: open !== undefined ? 8 : 196,
+            }}
+            transition={{
+              duration: 0.5,
+            }}
+            ref={sliderRef}
+            // animate={{ paddingLeft: pl }}
+            // drag="x"
+            // dragConstraints={containerRef}
+            // style={{ x }}
+            className="flex items-center mx-[196px] h-full gap-4 "
+          >
             <QuestionDndContainer
               orientation="horizontal"
               questions={questions}
@@ -225,7 +373,7 @@ function Create({ faurm }: { faurm: TFaurm }) {
                 </SortableItem>
               ))}
             </QuestionDndContainer>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

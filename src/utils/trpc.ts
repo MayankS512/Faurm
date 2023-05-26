@@ -10,9 +10,7 @@ export const trpc = createTRPCNext<AppRouter>({
       links: [
         httpBatchLink({
           url: `${
-            process.env.MODE
-              ? "http://localhost:3000/"
-              : "https://faurm.vercel.app/"
+            process.env.MODE ? "http://localhost:3000/" : "https://faurm.vercel.app/"
           }api/trpc`,
         }),
       ],

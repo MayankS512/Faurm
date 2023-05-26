@@ -104,7 +104,7 @@ function Faurm({ faurm }: { faurm: Faurm }) {
     });
   };
 
-  const [pointer, setPointer] = useState(false);
+  // const [pointer, setPointer] = useState(false);
 
   return (
     <>
@@ -137,13 +137,13 @@ function Faurm({ faurm }: { faurm: Faurm }) {
         </div>
         <h1 className="text-2xl">{title}</h1>
         <div
-          onPointerEnter={() => {
-            setPointer(true);
-          }}
-          onPointerLeave={() => {
-            setPointer(false);
-          }}
-          data-horizontal={pointer}
+          // onPointerEnter={() => {
+          //   setPointer(true);
+          // }}
+          // onPointerLeave={() => {
+          //   setPointer(false);
+          // }}
+          // data-horizontal={pointer}
           // ? Can also consider using pan gesture to make for easy scroll on Desktop, no need on mobile as that is the defualt behavior
           className="flex items-center h-[500px] px-2 overflow-x-auto overflow-y-hidden horizontal-scroll max-w-full gap-4 mt-10"
         >
@@ -168,34 +168,3 @@ function Faurm({ faurm }: { faurm: Faurm }) {
   );
 }
 
-/*
-<div key={id}>
-              <div className="flex flex-col items-center gap-4 p-4 rounded-sm bg-neutral-800">
-                <TextReader title={title} id={id} />
-                <p className="text-base text-neutral-300">
-                  <span className="font-medium">Type:</span> {type}
-                </p>
-                {fields.length ? (
-                  <ul className="flex flex-col gap-2">
-                    {fields.map(({ id, value }) => (
-                      // ? Name should ideally be question.id
-                      <li key={id}>
-                        <label className="flex items-center gap-2 p-2 rounded-sm focus-within:ring-2 bg-neutral-700">
-                          <input
-                            type="radio"
-                            value={value}
-                            name={title}
-                            aria-label={value}
-                            className="outline-none"
-                          />
-                          {value}
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <Textbox id={id} placeholder="Enter Answer Here..." />
-                )}
-              </div>
-            </div>
-*/

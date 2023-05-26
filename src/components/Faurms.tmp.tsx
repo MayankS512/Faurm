@@ -1,6 +1,5 @@
-import { TRPCOutputs, trpc } from "@/utils/trpc";
 import Head from "next/head";
-import React, { useState, useRef } from "react";
+import React from "react";
 import SortableItem from "@/components/SortableItem";
 import QuestionDndContainer from "@/components/QuestionDndContainer";
 import { RoundedButton } from "@/components/RoundedButton";
@@ -10,76 +9,39 @@ import {
   type TQuestion,
 } from "@/components/Question";
 import FormTitle from "@/components/FormTitle";
-import { useRouter } from "next/router";
-import { defaultTextboxState } from "@/components/Lexical/LexicalTextbox";
-import { useSession } from "next-auth/react";
 
-export type TFaurm = Exclude<TRPCOutputs["faurm"]["getFaurm"]["faurm"], null>;
+interface IFaurmsProps {
+  handleSave: () => void;
+  handleCreate: () => void;
+  handleDelete: (idx: number) => void;
+  handleUpdate: (question: TQuestion) => void;
+  title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  questions: TQuestion[];
+  setQuestions: React.Dispatch<React.SetStateAction<TQuestion[]>>;
+  open: string | undefined;
+  setOpen: React.Dispatch<React.SetStateAction<string | undefined>>;
+  temp: React.MutableRefObject<string | undefined>;
+}
 
-// TODO: Needs branding with Faurm logo (actually just text)
-// TODO: Could make this into a sub-component that can be shared between index.tsx and [id].tsx routes
-// ?: Take trpc procedure as input as it is the only major difference between the 2 (save for comments in [id].tsx verrsion).
-export default function Create() {
-  const [title, setTitle] = useState("Faurm Title");
-  const [questions, setQuestions] = useState<TQuestion[]>([]);
-  const [open, setOpen] = useState<string>();
-
-  const { data: session } = useSession();
-  const router = useRouter();
-
-  const temp = useRef(open);
-  const createFaurm = trpc.faurm.createFaurm.useMutation();
-
-  const handleSave = async () => {
-    const res = await createFaurm.mutateAsync({
-      title,
-      questions: questions.map(({ title, type, fields }) => ({
-        title,
-        type,
-        fields: fields.map(({ value }) => value),
-      })),
-    });
-
-    if (session?.user) {
-      router.push(`/create/${res.faurm.id}?share`);
-    } else {
-      router.push(`/${res.faurm.id}?share`);
-    }
-  };
-
-  const handleUpdate = (question: TQuestion) => {
-    setQuestions((prev) => {
-      const res = [...prev];
-      res[res.findIndex((val) => val.id === question.id)] = question;
-      return res;
-    });
-  };
-
-  const handleCreate = () => {
-    setQuestions((prev) => {
-      return [
-        ...prev,
-        {
-          id: "!" + (prev[prev.length - 1]?.id ?? ""),
-          faurmId: "",
-          title: defaultTextboxState,
-          type: "Text",
-          fields: [],
-        },
-      ];
-    });
-  };
-
-  const handleDelete = (idx: number) => {
-    setQuestions((prev) => [...prev.slice(0, idx), ...prev.slice(idx + 1)]);
-  };
-
+export const Faurms: React.FC<IFaurmsProps> = ({
+  handleCreate,
+  handleDelete,
+  handleSave,
+  handleUpdate,
+  open,
+  questions,
+  setOpen,
+  setQuestions,
+  setTitle,
+  title,
+  temp,
+}) => {
   return (
     <>
       <Head>
         <title>Faurm | Create</title>
       </Head>
-      {/* bg-gradient-to-br from-neutral-900 to-neutral-950 */}
       <div className="flex flex-col items-center justify-center w-full h-screen gap-4 p-10 ">
         <button
           className="absolute h-10 p-2 rounded-sm outline-none top-4 right-4 focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
@@ -168,4 +130,21 @@ export default function Create() {
       </div>
     </>
   );
-}
+};
+
+/* 
+? Usage
+<Faurms
+  handleSave={handleSave}
+  handleCreate={handleCreate}
+  handleDelete={handleDelete}
+  handleUpdate={handleUpdate}
+  open={open}
+  setOpen={setOpen}
+  questions={questions}
+  setQuestions={setQuestions}
+  title={title}
+  setTitle={setTitle}
+  temp={temp}
+/>
+*/

@@ -8,6 +8,7 @@ import {
   UniqueIdentifier,
   DragStartEvent,
   DragOverlay,
+  DragMoveEvent,
 } from "@dnd-kit/core";
 import {
   type SortingStrategy,
@@ -42,6 +43,8 @@ interface DndContainerProps<T> {
     dragging?: string;
   }>;
   keyboardEvents?: KeyboardEvents;
+  whileDragging?: (e: DragMoveEvent) => void;
+  draggingEnd?: (e: DragEndEvent) => void;
 }
 
 function DndContainer<T>({
@@ -52,6 +55,8 @@ function DndContainer<T>({
   orientation = "vertical",
   Overlay,
   keyboardEvents,
+  whileDragging,
+  draggingEnd,
 }: DndContainerProps<T>): React.ReactElement {
   const [dragging, setDragging] = useState<UniqueIdentifier>();
 
@@ -92,6 +97,7 @@ function DndContainer<T>({
         }
       }
     }
+    if (draggingEnd) draggingEnd(e);
 
     if (!over) return;
 
@@ -137,6 +143,7 @@ function DndContainer<T>({
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
       onDragStart={handleDragStart}
+      onDragMove={whileDragging}
     >
       <SortableContext
         items={items as UniqueIdentifier[]}

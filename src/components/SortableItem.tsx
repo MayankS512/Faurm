@@ -24,9 +24,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
 
   const style = {
     transition,
-    transform: transform
-      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-      : "",
+    transform: `translate3d(${transform?.x ?? 0}px, ${transform?.y ?? 0}px, 0)`,
   };
 
   return (
@@ -44,6 +42,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
       {...listeners}
       {...attributes}
       className={`${isDragging ? `opacity-60 z-50` : ""} ${className} `}
+      // onFocus={(e) => {
+      //   e.currentTarget.scrollIntoView({
+      //     behavior: "smooth",
+      //   });
+      // }}
     >
       {children}
     </div>
