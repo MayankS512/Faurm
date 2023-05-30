@@ -103,7 +103,6 @@ export function Question({
           faurmId,
         });
       }}
-      onSubmit={(e) => e.preventDefault()}
     >
       <motion.h2
         className="absolute p-4 text-2xl select-none"

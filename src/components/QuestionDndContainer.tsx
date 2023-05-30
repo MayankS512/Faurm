@@ -19,11 +19,12 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import React, { useState } from "react";
-import {
-  CustomMouseSensor,
-  CustomTouchSensor,
-} from "@/utils/sensors";
+import { CustomMouseSensor, CustomTouchSensor } from "@/utils/sensors";
 import { TRPCOutputs } from "@/utils/trpc";
+import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
 
 // ? This will be used in the mobile layout too, if that stays as a separate component having this as a component will be useful, otherwise could be merged with Question component although since this contains a lot of code, may still be better to keep it here.
 
@@ -139,11 +140,13 @@ const QuestionDndContainer: React.FC<QuestionDndContainerProps> = ({
       onDragEnd={handleDragEnd}
       onDragStart={handleDragStart}
       modifiers={
-        [
-          // restrictToHorizontalAxis,
-          // restrictToFirstScrollableAncestor,
-          // restrictToParentElement,
-        ]
+        orientation === "vertical"
+          ? [restrictToVerticalAxis, restrictToParentElement]
+          : [
+              // restrictToHorizontalAxis,
+              // restrictToFirstScrollableAncestor,
+              // restrictToParentElement,
+            ]
       }
     >
       <SortableContext items={questions} strategy={currentStrategy()}>

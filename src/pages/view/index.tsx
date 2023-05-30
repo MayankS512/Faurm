@@ -13,7 +13,6 @@ export default function View() {
   // }
 
   const faurms = trpc.faurm.getFaurms.useQuery();
-  console.log(faurms.data?.faurms);
 
   return (
     <>
@@ -57,7 +56,11 @@ export default function View() {
       </div>
       <main className="flex flex-col items-center justify-center w-full h-screen bg-gradient-to-br from-neutral-900 to-neutral-950">
         <h1 className={`${inter.className} text-6xl`}>Faurm</h1>
-        {faurms.data?.faurms && faurms.data?.faurms.length ? (
+        {faurms.isLoading ? (
+          <div className="p-4 mt-20">
+            <span className="loader"></span>
+          </div>
+        ) : faurms.data?.faurms && faurms.data?.faurms.length ? (
           <ul className="flex flex-col items-center gap-4 p-4 mt-20 text-xl text-center">
             {faurms.data?.faurms.map((faurm, idx) => (
               <li key={idx} className="w-full">

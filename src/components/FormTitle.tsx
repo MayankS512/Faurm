@@ -43,7 +43,7 @@ const FormTitle: React.FC<FormTitleProps> = ({ title, setTitle }) => {
       rows={1}
     ></textarea>
   ) : (
-    <h1
+    <h2
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Tab") return;
@@ -52,10 +52,10 @@ const FormTitle: React.FC<FormTitleProps> = ({ title, setTitle }) => {
       }}
       onDoubleClick={() => setEdit(true)}
       // w-full sm:w-1/2 lg:w-full
-      className="w-full p-2 my-2 text-2xl text-center break-all whitespace-pre-wrap rounded-sm outline-none  focus-visible:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900"
+      className="w-full p-2 my-2 text-2xl text-center break-all whitespace-pre-wrap rounded-sm outline-none focus-visible:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900"
     >
       {title ?? ""}
-    </h1>
+    </h2>
   );
 };
 

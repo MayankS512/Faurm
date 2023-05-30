@@ -1,15 +1,18 @@
 import { useSortable } from "@dnd-kit/sortable";
+import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 
 interface SortableItemProps {
   id: string | number;
   children: React.ReactNode;
   className?: string;
+  handle?: boolean;
 }
 
 const SortableItem: React.FC<SortableItemProps> = ({
   id,
   children,
   className,
+  handle,
 }) => {
   const {
     attributes,
@@ -39,7 +42,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
       }}
       style={style}
       ref={setNodeRef}
-      {...listeners}
+      {...(handle ? {} : listeners)}
       {...attributes}
       className={`${isDragging ? `opacity-60 z-50` : ""} ${className} `}
       // onFocus={(e) => {
@@ -48,6 +51,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
       //   });
       // }}
     >
+      {handle ? (
+        <div {...listeners} className="px-2">
+          <DragHandleDots2Icon className="w-4 h-4 shrink-0" />
+        </div>
+      ) : null}
       {children}
     </div>
   );

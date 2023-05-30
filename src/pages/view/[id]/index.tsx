@@ -140,6 +140,7 @@ function ViewUsers({
       </div>
       <main className="flex flex-col items-center justify-center w-full h-screen gap-8 bg-gradient-to-br from-neutral-900 to-neutral-950">
         <h1 className={`${inter.className} text-6xl`}>Faurm</h1>
+        <h2 className="text-2xl">{faurm.title}</h2>
         <Link
           href={`/create/${id}`}
           className="p-2 px-3 rounded-sm bg-neutral-800"

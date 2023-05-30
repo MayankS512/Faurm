@@ -1,12 +1,9 @@
-import { Answer } from "@/components/Answer";
-import { defaultTextboxState } from "@/components/Lexical/LexicalTextbox";
 import { TRPCOutputs, trpc } from "@/utils/trpc";
 import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { ShareModal } from "./create/[id]";
-import { Link2Icon } from "@radix-ui/react-icons";
+import { AnswerFaurm, MobileAnswerFaurm } from "@/components/Answers";
+import { useEffect, useState } from "react";
 
 type Faurm = Exclude<TRPCOutputs["faurm"]["getFaurm"]["faurm"], null>;
 
@@ -74,97 +71,19 @@ function DataCheck({ id }: { id: string }) {
 }
 
 function Faurm({ faurm }: { faurm: Faurm }) {
-  const { id, title, questions } = faurm;
-  const [open, setOpen] = useState<string>();
-  const [answers, setAnswers] = useState<
-    { questionId: string; value: string }[]
-  >(
-    questions.map((question) => ({
-      questionId: question.id,
-      value: question.type !== "Text" ? "" : defaultTextboxState,
-    }))
-  );
-  const submit = trpc.response.createResponse.useMutation();
-
-  const handleSubmit = () => {
-    console.log("Submitted");
-    submit.mutateAsync({
-      faurmId: id,
-      answers: answers,
-    });
-  };
-  const handleUpdate = (id: string, value: string) => {
-    setAnswers((prev) => {
-      const newAnswers = [...prev];
-      newAnswers[
-        newAnswers.findIndex((answer) => answer.questionId === id)
-      ].value = value;
-
-      return newAnswers;
-    });
+  const [width, setWidth] = useState(0);
+  const resizeHandler = () => {
+    setWidth(innerWidth);
   };
 
-  // const [pointer, setPointer] = useState(false);
+  useEffect(() => {
+    if (window) {
+      window.addEventListener("resize", resizeHandler);
+    }
 
-  return (
-    <>
-      <Head>
-        <title>Faurm | {title}</title>
-      </Head>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}
-        className="flex flex-col items-center justify-center w-full h-screen gap-4 p-10 "
-      >
-        <ShareModal />
-        <div className="absolute flex gap-2 top-4 right-4">
-          {/* <Link
-            href={id + "?share"}
-            // p-2 flex items-center gap-2
-            className="flex items-center justify-center w-10 h-10 rounded-sm outline-none focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
-          >
-            <Link2Icon />
-          </Link> */}
-          <button
-            className="p-2 rounded-sm outline-none focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
-            type="submit"
-            aria-label="Submit Response"
-          >
-            Submit
-          </button>
-        </div>
-        <h1 className="text-2xl">{title}</h1>
-        <div
-          // onPointerEnter={() => {
-          //   setPointer(true);
-          // }}
-          // onPointerLeave={() => {
-          //   setPointer(false);
-          // }}
-          // data-horizontal={pointer}
-          // ? Can also consider using pan gesture to make for easy scroll on Desktop, no need on mobile as that is the defualt behavior
-          className="flex items-center h-[500px] px-2 overflow-x-auto overflow-y-hidden horizontal-scroll max-w-full gap-4 mt-10"
-        >
-          <div className="flex items-center justify-center h-full gap-4 mx-[196px]">
-            {questions.map((question, idx) => (
-              <Answer
-                {...question}
-                value={answers[idx].value}
-                key={question.id}
-                index={idx}
-                open={open === question.id}
-                onClick={() =>
-                  setOpen(open === question.id ? undefined : question.id)
-                }
-                handleUpdate={handleUpdate}
-              />
-            ))}
-          </div>
-        </div>
-      </form>
-    </>
-  );
+    return () => window.removeEventListener("resize", resizeHandler);
+  });
+
+  if (width < 1024) return <MobileAnswerFaurm faurm={faurm} />;
+  return <AnswerFaurm faurm={faurm} />;
 }
-

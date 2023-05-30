@@ -69,7 +69,13 @@ import {
   useEffect,
   useState,
 } from "react";
-import { CodeIcon } from "@radix-ui/react-icons";
+import {
+  CodeIcon,
+  FontBoldIcon,
+  FontItalicIcon,
+  StrikethroughIcon,
+  UnderlineIcon,
+} from "@radix-ui/react-icons";
 import IconButton from "../../IconButton";
 import Dropdown, { DropdownOption } from "../../Dropdown";
 import { motion } from "framer-motion";
@@ -542,7 +548,7 @@ export default function ToolbarPlugin(): JSX.Element {
             label="Format text as bold."
             active={isBold}
           >
-            <span className="font-extrabold">B</span>
+            <FontBoldIcon className="icon" strokeWidth={2} />
           </IconButton>
           <IconButton
             disabled={!isEditable}
@@ -553,7 +559,7 @@ export default function ToolbarPlugin(): JSX.Element {
             label="Format text as Italics."
             active={isItalic}
           >
-            <span className="italic">I</span>
+            <FontItalicIcon className="icon" strokeWidth={2} />
           </IconButton>
           <IconButton
             disabled={!isEditable}
@@ -564,7 +570,7 @@ export default function ToolbarPlugin(): JSX.Element {
             label="Format text to be underlined."
             active={isUnderline}
           >
-            <span className="underline">U</span>
+            <UnderlineIcon className="icon" strokeWidth={2} />
           </IconButton>
           <IconButton
             disabled={!isEditable}
@@ -575,7 +581,7 @@ export default function ToolbarPlugin(): JSX.Element {
             label="Format text with a line through."
             active={isStrikethrough}
           >
-            <span className="line-through">S</span>
+            <StrikethroughIcon className="icon" strokeWidth={2} />
           </IconButton>
           <IconButton
             disabled={!isEditable}

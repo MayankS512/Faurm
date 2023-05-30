@@ -49,7 +49,9 @@ export default function Home() {
         )}
       </div>
       <main className="flex flex-col items-center justify-center w-full h-screen bg-gradient-to-br from-neutral-900 to-neutral-950">
-        <h1 className={`${inter.className} text-6xl`}>Faurm</h1>
+        <Link href="/">
+          <h1 className={`${inter.className} cursor-pointer text-6xl`}>Faurm</h1>
+        </Link>
         <ul className="flex flex-col items-center gap-4 p-4 mt-20 text-xl text-center">
           <li className="w-full">
             <Link

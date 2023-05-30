@@ -10,7 +10,7 @@ import {
   QuestionOverlay,
   type TQuestion,
 } from "@/components/Question";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useSpring } from "framer-motion";
 import FormTitle from "@/components/FormTitle";
 import Link from "next/link";
 import {
@@ -22,6 +22,8 @@ import {
 import { Dialog } from "@headlessui/react";
 import { defaultTextboxState } from "@/components/Lexical/LexicalTextbox";
 import { TFaurm } from ".";
+import { useSession } from "next-auth/react";
+import { MobileQuestion } from "@/components/MobileQuestion";
 
 /* 
 TODO: Responsive Design
@@ -39,6 +41,23 @@ TODO: FormContainer Overlay
 export default function ParamCheck() {
   const router = useRouter();
   const { id } = router.query;
+  const { data } = useSession();
+
+  if (!data?.user) {
+    return (
+      <>
+        <Head>Faurm | Create</Head>
+        <div className="flex items-center justify-center w-screen h-screen">
+          <div className="p-2 bg-neutral-800">
+            <h2 className="text-2xl">Invalid User!</h2>
+            <Link className="p-2 cursor-pointer bg-neutral-700" href="/">
+              Go to Homepage
+            </Link>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   // console.log(share);
 
@@ -60,6 +79,7 @@ export default function ParamCheck() {
 }
 
 function DataCheck({ id }: { id: string }) {
+  const { data: session } = useSession();
   const faurm = trpc.faurm.getFaurm.useQuery(
     { id },
     { refetchOnWindowFocus: false } // ? Should possibly be true in prod.
@@ -71,12 +91,42 @@ function DataCheck({ id }: { id: string }) {
         <span className="loader"></span>
       </div>
     );
+  if (faurm.data?.faurm?.userId !== session?.user.id) {
+    return (
+      <div className="flex items-center justify-center w-screen h-screen">
+        <div className="p-2 bg-neutral-800">
+          <h2 className="text-2xl">Invalid User!</h2>
+          <Link className="p-2 cursor-pointer bg-neutral-700" href="/">
+            Go to Homepage
+          </Link>
+        </div>
+      </div>
+    );
+  }
   if (faurm.isError || !faurm.data.faurm) return <p>Invalid Request :(</p>;
 
   return <Create faurm={faurm.data.faurm} />;
 }
 
 function Create({ faurm }: { faurm: TFaurm }) {
+  const [width, setWidth] = useState(0);
+  const resizeHandler = () => {
+    setWidth(innerWidth);
+  };
+
+  useEffect(() => {
+    if (window) {
+      window.addEventListener("resize", resizeHandler);
+    }
+
+    return () => window.removeEventListener("resize", resizeHandler);
+  });
+
+  if (width < 1024) return <Mobile faurm={faurm} />;
+  return <Default faurm={faurm} />;
+}
+
+function Default({ faurm }: { faurm: TFaurm }) {
   const { title: retrievedTitle, questions: retrievedQuestions, id } = faurm;
 
   const [title, setTitle] = useState(retrievedTitle);
@@ -97,7 +147,6 @@ function Create({ faurm }: { faurm: TFaurm }) {
         fields: fields.map(({ value }) => value),
       })),
     });
-    console.log("Updated Faurm", id);
   };
 
   const updateQuestion = (question: TQuestion) => {
@@ -109,11 +158,12 @@ function Create({ faurm }: { faurm: TFaurm }) {
   };
 
   const handleCreate = async () => {
+    if (questions.length >= 100) return;
     setQuestions((prev) => {
       return [
         ...prev,
         {
-          id: "!" + (prev[prev.length - 1]?.id ?? ""),
+          id: crypto.randomUUID(),
           faurmId: id,
           title: defaultTextboxState,
           type: "Text",
@@ -169,7 +219,7 @@ function Create({ faurm }: { faurm: TFaurm }) {
             <p>No Questions...</p>
           </div>
         ) : (
-          <div className="flex items-center mx-[196px] h-full gap-4 ">
+          <div className="flex mx-[196px] h-full gap-4 p-2 items-center">
             <QuestionDndContainer
               orientation="horizontal"
               questions={questions}
@@ -228,6 +278,190 @@ function Create({ faurm }: { faurm: TFaurm }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function Mobile({ faurm }: { faurm: TFaurm }) {
+  const { title: retrievedTitle, questions: retrievedQuestions, id } = faurm;
+
+  const [title, setTitle] = useState(retrievedTitle);
+  const [questions, setQuestions] = useState(retrievedQuestions);
+  const [open, setOpen] = useState<number | undefined>(
+    questions.length ? 0 : undefined
+  );
+
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const createFaurm = trpc.faurm.createFaurm.useMutation();
+
+  const handleSave = async () => {
+    const res = await createFaurm.mutateAsync({
+      title,
+      questions: questions.map(({ title, type, fields }) => ({
+        title,
+        type,
+        fields: fields.map(({ value }) => value),
+      })),
+    });
+
+    if (session?.user) {
+      router.push(`/create/${res.faurm.id}?share`);
+    } else {
+      router.push(`/${res.faurm.id}?share`);
+    }
+  };
+
+  const handleUpdate = (question: TQuestion) => {
+    setQuestions((prev) => {
+      const res = [...prev];
+      res[res.findIndex((val) => val.id === question.id)] = question;
+      return res;
+    });
+  };
+
+  const handleCreate = () => {
+    if (questions.length >= 100) return;
+
+    setQuestions((prev) => {
+      return [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          faurmId: "",
+          title: defaultTextboxState,
+          type: "Text",
+          fields: [],
+        },
+      ];
+    });
+    setOpen(questions.length);
+  };
+
+  // useEffect(() => {
+  //   console.log(window.navigator.userAgent);
+
+  // }, [])
+
+  const handleDelete = (idx: number) => {
+    setOpen((prev) => {
+      if (prev === undefined) {
+        return prev;
+      }
+      if (questions.length === 1) {
+        return undefined;
+      }
+      if (prev > 0) {
+        return prev - 1;
+      } else {
+        return prev;
+      }
+    });
+    setQuestions((prev) => [...prev.slice(0, idx), ...prev.slice(idx + 1)]);
+  };
+
+  const x = useSpring(0, {
+    stiffness: 400,
+    damping: 30,
+  });
+
+  return (
+    <div className="flex h-screen overflow-x-hidden">
+      <motion.section
+        onPan={(_evt, { delta }) => {
+          x.jump(Math.max(Math.min(x.get() + delta.x, 160), 0));
+        }}
+        onPanEnd={(_evt, { offset }) => {
+          if (x.get() > 80) {
+            x.set(160);
+          } else {
+            x.set(0);
+          }
+        }}
+        className="absolute top-0 left-0 flex flex-col items-center w-40 h-screen gap-8 py-8 overflow-auto bg-neutral-800 touch-pan-y"
+      >
+        <QuestionDndContainer
+          orientation="vertical"
+          questions={questions}
+          setQuestions={setQuestions}
+        >
+          {questions.map((question, idx) => (
+            <SortableItem
+              className="rounded-full outline-none "
+              key={question.id}
+              id={question.id}
+            >
+              <RoundedButton onClick={() => setOpen(idx)}>
+                {idx + 1}
+              </RoundedButton>
+            </SortableItem>
+          ))}
+        </QuestionDndContainer>
+      </motion.section>
+
+      <motion.div
+        onPan={(_evt, { delta }) => {
+          x.jump(Math.max(Math.min(x.get() + delta.x, 160), 0));
+        }}
+        onPanEnd={(_evt, { offset }) => {
+          if (x.get() > 80) {
+            x.set(160);
+          } else {
+            x.set(0);
+          }
+        }}
+        style={{ x }}
+        className="flex flex-col items-center justify-evenly w-full min-h-screen h-full gap-4 p-10 touch-pan-y bg-neutral-900 z-[5]"
+      >
+        <ShareModal />
+        <div className="absolute flex gap-2 top-4 right-4">
+          <Link
+            href={id + "?share"}
+            // p-2 flex items-center gap-2
+            className="flex items-center justify-center w-10 h-10 rounded-sm outline-none focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
+          >
+            <Link2Icon />
+            {/* Share */}
+          </Link>
+          <button
+            className="p-2 rounded-sm outline-none focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
+            onClick={handleSave}
+            type="button"
+            aria-label="Save Faurm"
+          >
+            Save
+          </button>
+        </div>
+        <FormTitle title={title} setTitle={setTitle} />
+        <button
+          className="p-2 rounded-sm outline-none dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-200 focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900"
+          onClick={handleCreate}
+          aria-label="Create Question"
+        >
+          Add Question
+        </button>
+
+        <div className="flex items-center h-[500px] max-w-full gap-4">
+          {open === undefined ? (
+            <div className="p-4 rounded-sm bg-neutral-800">
+              <p>No Questions...</p>
+            </div>
+          ) : (
+            <MobileQuestion
+              key={open}
+              faurmId={questions[open].faurmId}
+              fields={questions[open].fields}
+              handleDelete={() => handleDelete(open)}
+              handleUpdate={handleUpdate}
+              id={questions[open].id}
+              index={open}
+              title={questions[open].title}
+              type={questions[open].type}
+            />
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 }
