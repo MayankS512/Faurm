@@ -23,7 +23,7 @@ export function MobileAnswer({
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center grid-cols-2 gap-4 overflow-y-auto outline-none sm:grid min-h-fit bg-neutral-800"
+      className="relative flex flex-col items-center justify-center grid-cols-2 gap-4 pb-4 overflow-y-auto outline-none sm:gap-0 sm:grid min-w-fit min-h-fit bg-neutral-800"
       onBlur={() => {
         if (!handleUpdate) return;
         if (type !== "Text") {
@@ -33,9 +33,8 @@ export function MobileAnswer({
         }
       }}
     >
-      <div className="flex flex-col items-center justify-center w-full min-w-[288px] gap-4">
-        <h2 className="absolute p-4 text-2xl select-none">{index + 1}</h2>
-        <div className="w-full min-w-[288px] h-14"></div>
+      <div className="flex flex-col items-center justify-center w-[288px] gap-4">
+        <h2 className="p-4 text-2xl select-none">{index + 1}</h2>
         <div
           onClick={(e) => e.stopPropagation()}
           className="flex flex-col w-full gap-2 px-4"
@@ -49,7 +48,7 @@ export function MobileAnswer({
           />
         </div>
       </div>
-      <div className="flex flex-col items-center justify-center w-full gap-4 sm:py-2 min-w-[288px]">
+      <div className="flex flex-col items-center justify-center w-[288px] gap-4 sm:py-2">
         <p onClick={(e) => e.stopPropagation()} className="w-full px-4">
           {type !== "Text" ? "Options:" : "Answer:"}
         </p>
@@ -90,7 +89,7 @@ export function MobileAnswer({
         ) : (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full px-4 mb-4"
+            className="w-full px-4"
           >
             <LexicalTextbox
               id={id}

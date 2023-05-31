@@ -1,7 +1,7 @@
 import { trpc } from "@/utils/trpc";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import SortableItem from "@/components/SortableItem";
 import QuestionDndContainer from "@/components/QuestionDndContainer";
 import { RoundedButton } from "@/components/RoundedButton";
@@ -109,21 +109,289 @@ function DataCheck({ id }: { id: string }) {
 }
 
 function Create({ faurm }: { faurm: TFaurm }) {
-  const [width, setWidth] = useState(0);
-  const resizeHandler = () => {
-    setWidth(innerWidth);
+  const MOBILE_WIDTH = 820;
+
+  const { title: retrievedTitle, questions: retrievedQuestions, id } = faurm;
+  const [width, setWidth] = useState(MOBILE_WIDTH);
+  const [title, setTitle] = useState(retrievedTitle);
+  const [questions, setQuestions] = useState(retrievedQuestions);
+  const [open, setOpen] = useState<string>();
+  const openIdx = useMemo(
+    () => questions.findIndex((question) => question.id === open),
+    [open, questions]
+  );
+  const x = useSpring(0, {
+    stiffness: 400,
+    damping: 30,
+  });
+
+  const temp = useRef(open);
+
+  const setFaurm = trpc.faurm.setFaurm.useMutation();
+
+  const handleSave = async () => {
+    const res = await setFaurm.mutateAsync({
+      id,
+      title,
+      questions: questions.map(({ title, type, fields }) => ({
+        title,
+        type,
+        fields: fields.map(({ value }) => value),
+      })),
+    });
+  };
+
+  const updateQuestion = (question: TQuestion) => {
+    setQuestions((prev) => {
+      const res = [...prev];
+      res[res.findIndex((val) => val.id === question.id)] = question;
+      return res;
+    });
+  };
+
+  const handleCreate = async () => {
+    if (questions.length >= 100) return;
+    setQuestions((prev) => {
+      return [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          faurmId: id,
+          title: defaultTextboxState,
+          type: "Text",
+          fields: [],
+        },
+      ];
+    });
+  };
+
+  const handleDelete = async (idx: number, id: string) => {
+    setQuestions((prev) => [...prev.slice(0, idx), ...prev.slice(idx + 1)]);
   };
 
   useEffect(() => {
+    const resizeHandler = () => {
+      setWidth(innerWidth);
+    };
+
     if (window) {
+      resizeHandler();
       window.addEventListener("resize", resizeHandler);
     }
 
     return () => window.removeEventListener("resize", resizeHandler);
-  });
+  }, []);
 
-  if (width < 1024) return <Mobile faurm={faurm} />;
-  return <Default faurm={faurm} />;
+  useEffect(() => {
+    if (width < MOBILE_WIDTH && questions.length && !open) {
+      setOpen(questions[questions.length - 1].id);
+    }
+  }, [width, open, questions]);
+
+  // if (width < 1024) return <Mobile faurm={faurm} />;
+  // return <Default faurm={faurm} />;
+
+  return (
+    <div className="flex h-screen overflow-x-hidden">
+      <Head>
+        <title>Faurm | {title}</title>
+      </Head>
+
+      {width < MOBILE_WIDTH ? (
+        <motion.section
+          onPan={(_evt, { delta }) => {
+            x.jump(Math.max(Math.min(x.get() + delta.x, 160), 0));
+          }}
+          onPanEnd={() => {
+            if (x.get() > 80) {
+              x.set(160);
+            } else {
+              x.set(0);
+            }
+          }}
+          className="absolute top-0 left-0 flex flex-col items-center w-40 h-screen gap-8 py-8 overflow-auto bg-neutral-800 touch-pan-y"
+        >
+          <QuestionDndContainer
+            orientation="vertical"
+            questions={questions}
+            setQuestions={setQuestions}
+          >
+            {questions.map((question, idx) => (
+              <SortableItem
+                className="rounded-full outline-none "
+                key={question.id}
+                id={question.id}
+              >
+                <RoundedButton onClick={() => setOpen(question.id)}>
+                  {idx + 1}
+                </RoundedButton>
+              </SortableItem>
+            ))}
+          </QuestionDndContainer>
+        </motion.section>
+      ) : null}
+
+      {width < MOBILE_WIDTH ? (
+        <motion.div
+          onPan={(_evt, { delta }) => {
+            x.jump(Math.max(Math.min(x.get() + delta.x, 160), 0));
+          }}
+          onPanEnd={() => {
+            if (x.get() > 80) {
+              x.set(160);
+            } else {
+              x.set(0);
+            }
+          }}
+          style={{ x }}
+          className="flex flex-col items-center justify-evenly w-full min-h-screen h-full gap-4 p-10 touch-pan-y bg-neutral-900 z-[5]"
+        >
+          <ShareModal />
+          <div className="absolute flex gap-2 top-4 right-4">
+            <Link
+              href={id + "?share"}
+              // p-2 flex items-center gap-2
+              className="flex items-center justify-center w-10 h-10 rounded-sm outline-none focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
+            >
+              <Link2Icon />
+              {/* Share */}
+            </Link>
+            <button
+              className="p-2 rounded-sm outline-none focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
+              onClick={handleSave}
+              type="button"
+              aria-label="Save Faurm"
+            >
+              Save
+            </button>
+          </div>
+          <FormTitle title={title} setTitle={setTitle} />
+          <button
+            className="p-2 rounded-sm outline-none dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-200 focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900"
+            onClick={handleCreate}
+            aria-label="Create Question"
+          >
+            Add Question
+          </button>
+
+          <div className="flex items-center h-[500px] max-w-full gap-4">
+            {open === undefined ? (
+              <div className="p-4 rounded-sm bg-neutral-800">
+                <p>No Questions...</p>
+              </div>
+            ) : (
+              <MobileQuestion
+                key={open}
+                {...questions[openIdx]}
+                handleDelete={() =>
+                  handleDelete(openIdx, questions[openIdx].id)
+                }
+                handleUpdate={updateQuestion}
+                index={openIdx}
+              />
+            )}
+          </div>
+        </motion.div>
+      ) : (
+        <div className="flex flex-col items-center justify-center w-full h-screen gap-4 p-10 ">
+          <ShareModal />
+          <div className="absolute flex gap-2 top-4 right-4">
+            <Link
+              href={id + "?share"}
+              // p-2 flex items-center gap-2
+              className="flex items-center justify-center w-10 h-10 rounded-sm outline-none focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
+            >
+              <Link2Icon />
+              {/* Share */}
+            </Link>
+            <button
+              className="p-2 rounded-sm outline-none focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900 bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
+              onClick={handleSave}
+              type="button"
+              aria-label="Save Faurm"
+            >
+              Save
+            </button>
+          </div>
+          <FormTitle title={title} setTitle={setTitle} />
+          <div className="flex gap-4">
+            <button
+              className="p-2 rounded-sm outline-none dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-neutral-200 focus:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-900"
+              onClick={handleCreate}
+              aria-label="Create Question"
+            >
+              Add Question
+            </button>
+          </div>
+          <div
+            // hidden-scroll
+            className="flex items-center h-[500px] overflow-x-auto overflow-y-hidden horizontal-scroll max-w-full gap-4 mt-10"
+          >
+            {!questions.length ? (
+              <div className="p-4 rounded-sm bg-neutral-800">
+                <p>No Questions...</p>
+              </div>
+            ) : (
+              <div className="flex mx-[196px] h-full gap-4 p-2 items-center">
+                <QuestionDndContainer
+                  orientation="horizontal"
+                  questions={questions}
+                  setQuestions={setQuestions}
+                  keyboardEvents={{
+                    start() {
+                      temp.current = open;
+                      setOpen(undefined);
+                    },
+                    end() {
+                      setOpen(temp.current);
+                      temp.current = undefined;
+                    },
+                  }}
+                  Overlay={({ dragging }) => (
+                    <QuestionOverlay
+                      index={dragging}
+                      open={open === questions[dragging].id}
+                      {...questions[dragging]}
+                    />
+                  )}
+                >
+                  {questions.map((question, idx) => (
+                    <SortableItem
+                      className={`${
+                        question.id === open ? "rounded-md" : "rounded-full"
+                      } outline-none focus-visible:ring-2 ring-neutral-600  ring-offset-1 h-fit 
+                  ring-offset-neutral-900`}
+                      key={question.id}
+                      id={question.id}
+                    >
+                      {temp.current ? (
+                        <RoundedButton className="bg-neutral-800">
+                          {idx + 1}
+                        </RoundedButton>
+                      ) : (
+                        <Question
+                          index={idx}
+                          onClick={() => {
+                            setOpen(
+                              question.id === open ? undefined : question.id
+                            );
+                          }}
+                          open={question.id === open}
+                          handleDelete={() => handleDelete(idx, question.id)}
+                          handleUpdate={updateQuestion}
+                          {...question}
+                        />
+                      )}
+                    </SortableItem>
+                  ))}
+                </QuestionDndContainer>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Default({ faurm }: { faurm: TFaurm }) {

@@ -49,7 +49,7 @@ export function MobileQuestion({
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center grid-cols-2 gap-4 overflow-y-auto outline-none sm:grid min-h-fit bg-neutral-800"
+      className="relative flex flex-col items-center justify-center grid-cols-2 gap-4 overflow-y-auto outline-none sm:gap-0 sm:grid min-h-fit bg-neutral-800"
       onBlur={() => {
         if (
           retreivedFields === fields &&
@@ -68,7 +68,7 @@ export function MobileQuestion({
         });
       }}
     >
-      <div className="flex flex-col items-center justify-center w-full min-w-[288px] gap-4">
+      <div className="flex flex-col items-center justify-center w-[288px] gap-4">
         <h2 className="p-4 text-2xl select-none">{index + 1}</h2>
         <button
           type="button"
@@ -104,7 +104,7 @@ export function MobileQuestion({
           </select>
         </label>
       </div>
-      <div className="flex flex-col items-center justify-center w-full gap-4 sm:py-2">
+      <div className="flex flex-col items-center justify-center w-[288px] gap-4 sm:py-2">
         {type !== "Text" ? (
           <ul
             onClick={(e) => e.stopPropagation()}
