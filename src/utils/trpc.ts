@@ -9,7 +9,7 @@ export const trpc = createTRPCNext<AppRouter>({
     return {
       links: [
         httpBatchLink({
-          url: "http://localhost:3000/api/trpc",
+          url: "https://faurm.vercel.app/api/trpc",
         }),
       ],
       transformer: superjson,
