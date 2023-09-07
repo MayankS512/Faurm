@@ -6,9 +6,6 @@ import { useRouter } from "next/router";
 // Fuzzy Search Library
 import commandScore from "command-score";
 
-// Shortcut Library
-import { useHotkeys } from "react-hotkeys-hook";
-
 interface Props {
   questions?: number;
   changeTitle?: (tile: string) => void;
