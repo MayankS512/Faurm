@@ -50,7 +50,7 @@ export function Question({
     setFields((prev) => [
       ...prev,
       {
-        id: "Z" + (prev[prev.length - 1]?.id ?? ""),
+        id: "Z" + crypto.randomUUID(),
         value: "",
         questionId: id,
       },
@@ -163,7 +163,6 @@ export function Question({
                 onChange={(e) => setType(e.target.value)}
               >
                 <option value="MCQ">MCQ</option>
-                <option value="MAQ">MAQ</option>
                 <option value="Text">Text</option>
               </select>
             </motion.label>
@@ -371,7 +370,6 @@ export function QuestionOverlay({
               defaultValue={type}
             >
               <option value="MCQ">MCQ</option>
-              <option value="MAQ">MAQ</option>
               <option value="Text">Text</option>
             </select>
           </label>

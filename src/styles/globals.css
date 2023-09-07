@@ -96,6 +96,14 @@ body {
   @apply transition-all duration-200 bg-neutral-700;
 }
 
+.cmd-scroll::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.cmd-scroll::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-neutral-500/20;
+}
+
 .dropdown-scroll::-webkit-scrollbar,
 .editor-scroll::-webkit-scrollbar {
   @apply w-2;

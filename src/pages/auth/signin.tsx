@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]";
 import { getProviders, signIn } from "next-auth/react";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,10 +25,13 @@ export default function SignIn({
       </Head>
       <main
         className={
-          "bg-gradient-to-br from-black to-neutral-900 h-screen w-screen flex flex-col items-center justify-center " +
+          "bg-gradient-to-br from-neutral-900 to-neutral-950 h-screen w-screen flex flex-col items-center justify-center " +
           inter.className
         }
       >
+        <Link href="/">
+          <h1 className="mb-10 text-6xl cursor-pointer">Faurm</h1>
+        </Link>
         <div className="flex flex-col items-center gap-4 p-4 rounded-sm bg-neutral-800">
           <h1 className="text-2xl font-thin">Sign In</h1>
           {Object.values(providers).map((provider) => (

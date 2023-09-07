@@ -20,7 +20,6 @@ const MemberProperties = {
 
 export function Answer({
   id,
-  faurmId,
   title,
   type,
   fields,

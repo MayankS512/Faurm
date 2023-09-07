@@ -32,7 +32,7 @@ export function MobileQuestion({
     setFields((prev) => [
       ...prev,
       {
-        id: crypto.randomUUID(),
+        id: "Z" + crypto.randomUUID(),
         value: "",
         questionId: id,
       },
@@ -99,7 +99,6 @@ export function MobileQuestion({
             onChange={(e) => setType(e.target.value)}
           >
             <option value="MCQ">MCQ</option>
-            <option value="MAQ">MAQ</option>
             <option value="Text">Text</option>
           </select>
         </label>
