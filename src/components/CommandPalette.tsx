@@ -6,6 +6,9 @@ import { useRouter } from "next/router";
 // Fuzzy Search Library
 import commandScore from "command-score";
 
+// Shortcut Library
+import { useHotkeys } from "react-hotkeys-hook";
+
 interface Props {
   questions?: number;
   changeTitle?: (tile: string) => void;
@@ -132,7 +135,7 @@ const CommandPalette: React.FC<Props> = ({
 
               // cmdStr.toLowerCase().includes(query.toLowerCase())
 
-              return commandScore(cmdStr, query) > 0.0015 
+              return commandScore(cmdStr, query) > 0.0015
                 ? {
                     phrase: cmdStr,
                     action: command.action.bind(this, ...values),
@@ -143,23 +146,21 @@ const CommandPalette: React.FC<Props> = ({
     [commands, query, questions]
   );
 
+  // ? Can't overtake browser shortcut
   useEffect(() => {
-    function openPalette(e: globalThis.KeyboardEvent) {
-      if ((e.ctrlKey || e.metaKey) && e.key.toUpperCase() === "K") {
+    function togglePalette(e: globalThis.KeyboardEvent) {
+      if (e.ctrlKey && e.key.toUpperCase() === "K") {
         e.preventDefault();
-        // e.stopPropagation();
         setShow((prev) => !prev);
       }
     }
 
-    if (window) {
-      window.addEventListener("keypress", openPalette);
+    if (document) {
+      document.addEventListener("keydown", togglePalette);
     }
 
-    return () => window.removeEventListener("keypress", openPalette);
+    return () => document.removeEventListener("keydown", togglePalette);
   }, []);
-
-  // console.log("rerender");
 
   return (
     <>
