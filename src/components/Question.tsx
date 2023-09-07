@@ -12,7 +12,8 @@ import LexicalRenderer from "./Lexical/LexicalRenderer";
 import LexicalTextbox from "./Lexical/LexicalTextbox";
 
 import type { TFaurm } from "@/pages/create";
-export type TQuestion = TFaurm["questions"][0];
+export type TQuestion = TFaurm["questions"][number];
+export type Field = TQuestion["fields"][number];
 
 const MemberProperties = {
   variants: MemberVariant,

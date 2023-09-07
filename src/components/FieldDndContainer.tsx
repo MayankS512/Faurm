@@ -21,11 +21,10 @@ import {
 } from "@dnd-kit/modifiers";
 import React, { useState } from "react";
 import { CustomMouseSensor, CustomTouchSensor } from "@/utils/sensors";
-import { TRPCOutputs } from "@/utils/trpc";
 
 // ? This will be used in the mobile layout too, if that stays as a separate component having this as a component will be useful, otherwise could be merged with Question component although since this contains a lot of code, may still be better to keep it here.
 
-type Field = TRPCOutputs["field"]["getFields"]["fields"][number];
+import type { Field } from "./Question";
 
 interface FieldDndContainerProps {
   children?: React.ReactNode;
