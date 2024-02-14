@@ -45,6 +45,7 @@ function DataCheck({ id }: { id: string }) {
     { faurmId: id },
     { refetchOnWindowFocus: false }
   );
+  const { data: session } = useSession();
 
   if (faurm.isLoading || responses.isLoading)
     return (
@@ -81,6 +82,25 @@ function DataCheck({ id }: { id: string }) {
         </div>
       </>
     );
+
+  if (
+    faurm.data?.faurm?.userId &&
+    faurm.data?.faurm?.userId !== session?.user.id
+  ) {
+    return (
+      <div className="flex items-center justify-center w-screen h-screen">
+        <div className="flex flex-col items-center justify-center gap-2 p-2 rounded-sm bg-neutral-800">
+          <h2 className="text-xl">Invalid User!</h2>
+          <Link
+            className="p-2 rounded-sm outline-none cursor-pointer focus-visible:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-800 bg-neutral-700"
+            href="/"
+          >
+            Go to Homepage
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ViewUsers id={id} faurm={faurm.data.faurm} responses={responses.data} />

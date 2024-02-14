@@ -94,6 +94,19 @@ function DataCheck({ id }: { id: string }) {
         <span className="loader"></span>
       </div>
     );
+  if (!faurm.data?.faurm?.userId) {
+    return (
+      <div className="flex items-center justify-center w-screen h-screen">
+        <div className="flex flex-col items-center justify-center gap-2 p-2 rounded-sm bg-neutral-800">
+          <h2 className="text-xl">This faurm is uneditable!</h2>
+          <p>Only faurms created by an authorized user are editable.</p>
+          <Link className="p-2 rounded-sm outline-none cursor-pointer focus-visible:ring-2 ring-neutral-200 ring-offset-1 ring-offset-neutral-800 bg-neutral-700" href="/">
+            Go to Homepage
+          </Link>
+        </div>
+      </div>
+    );
+  }
   if (faurm.data?.faurm?.userId !== session?.user.id) {
     return (
       <div className="flex items-center justify-center w-screen h-screen">

@@ -3,16 +3,21 @@ import { Inter } from "next/font/google";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function View() {
   const { data: session } = useSession();
-  // if (!session?.user) {
-  //   router.push("/");
-  // }
-
+  const router = useRouter();
   const faurms = trpc.faurm.getFaurms.useQuery();
+
+  useEffect(() => {
+    if (!session?.user) {
+      router.push("/");
+    }
+  }, [session, router]);
 
   return (
     <>
@@ -55,6 +60,7 @@ export default function View() {
         )}
       </div>
       <main className="flex flex-col items-center justify-center w-full h-screen bg-gradient-to-br from-neutral-900 to-neutral-950">
+        
         <h1 className={`${inter.className} text-6xl`}>Faurm</h1>
         {faurms.isLoading ? (
           <div className="p-4 mt-20">
