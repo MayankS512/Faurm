@@ -34,7 +34,7 @@ TODO: Responsive Design
 /* 
 TODO: FormContainer Overlay
 * A revision for this drag behaviour could also prove to be beneficial such as: 
-  * Closing opened FormContainer if it is not the one beind dragged.
+  * Closing opened FormContainer if it is not the one being dragged.
   * Revisiting the keyboard drag behavior of instantly (w/o animation) closing the opened containers. 
 */
 
